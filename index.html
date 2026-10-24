@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0B0F19">
+  <meta name="description" content="Red Cero. Forma tu tripulación. Reconstruye la señal.">
+  <title>Red Cero · Acceso a la estación</title>
+  <link rel="icon" type="image/svg+xml" href="public/assets/isotipo.svg">
+  <link rel="stylesheet" href="public/style.css"><script type="module" src="public/app.js"></script>
+  <link rel="stylesheet" href="public/sector.css">
+</head>
+<body>
+  <header><a class="brand" href="./" aria-label="Red Cero, inicio"><picture><source media="(max-width: 620px)" srcset="public/assets/isotipo.svg"><img class="brand-logo" src="public/assets/logotipo.svg" alt="Red Cero" width="600" height="150"></picture><span class="edition">ALPHA / 0.1</span></a><span class="header-note"><span class="dot"></span> RED CERO · MÉXICO</span></header>
+  <main>
+    <section class="world" aria-labelledby="world-title">
+      <div class="eyebrow"><span class="line"></span> SEÑAL DETECTADA / SECTOR 00</div>
+      <h1 id="world-title">Todo empieza<br>con una <em>señal.</em></h1>
+      <p class="intro">Una estación en silencio. Un mundo por reconstruir.<br>Lo que viene después, lo decides con tu tripulación.</p>
+      <div class="scene" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="cross cross-one">+</div><div class="cross cross-two">+</div>
+        <div class="signal-label">NODO CENTRAL <span>01</span></div>
+        <div class="tower"><div class="antenna"></div><div class="tower-head"><i></i><i></i><i></i></div><div class="tower-body"><span>R / 0</span><div class="vents"></div></div><div class="tower-foot"></div></div>
+        <div class="platform"></div><div class="coordinate">X: -003 &nbsp; Y: +002</div><div class="scene-note">BUSCANDO TRIPULACIÓN<span>▰ ▰ ▰ ▱ ▱</span></div>
+      </div>
+      <div class="world-footer"><span>EXPLORA. CONSTRUYE. CONECTA.</span><span>01 — ∞</span></div>
+    </section>
+    <section class="access" aria-labelledby="access-title">
+      <div class="access-inner">
+        <div class="eyebrow">ENLACE DE TRIPULACIÓN</div>
+        <div id="auth-view">
+          <h2 id="access-title">Vuelve a la señal.</h2><p class="subtitle" id="form-subtitle">Tu próximo punto de encuentro está aquí.</p>
+          <div class="tabs" aria-label="Tipo de acceso"><button type="button" class="active" id="login-tab" aria-pressed="true">Iniciar sesión</button><button type="button" id="register-tab" aria-pressed="false">Crear cuenta</button></div>
+          <form id="auth-form">
+            <label for="username">ALIAS DE JUGADOR</label><input id="username" name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]{3,24}" placeholder="Tu nombre en la estación" aria-describedby="alias-hint"><small id="alias-hint">3–24 letras, números o guion bajo.</small>
+            <div id="email-field" hidden><label for="email">CORREO ELECTRÓNICO</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="tu@correo.com" aria-describedby="email-hint" disabled><small id="email-hint">Tu correo es privado. Permite a tu docente encontrarte y relacionar tu progreso.</small></div>
+            <label for="password">CONTRASEÑA</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72" placeholder="Tu clave de acceso"><button type="button" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false">Ver</button></div>
+            <small id="password-hint" hidden>Elige una clave de al menos 10 caracteres y guárdala para volver.</small>
+            <div id="confirm-field" hidden><label for="confirm">REPITE TU CONTRASEÑA</label><input id="confirm" name="confirm" type="password" autocomplete="new-password" maxlength="72" placeholder="Confirma tu clave"></div>
+            <p id="message" role="status" aria-live="polite"></p>
+            <button class="primary" type="submit" id="submit-button"><span id="submit-label">Conectar a la estación</span><span aria-hidden="true">↗</span></button>
+          </form>
+          <p class="privacy">Juega con tu alias. Tu correo no se muestra a otros jugadores.<br>Tu nombre real puede quedarse fuera de la estación.</p>
+        </div>
+        <div id="connected-view" hidden>
+          <img class="crew-emblem" src="public/assets/isotipo.svg" alt="" width="64" height="64">
+          <span class="connected-tag"><span class="dot"></span> ENLACE ESTABLECIDO</span>
+          <h2>Estás dentro,<br><span id="player-name"></span>.</h2>
+          <p class="subtitle">Tu credencial de tripulación está lista.</p>
+          <div class="mission"><span class="eyebrow">SECTOR 01 · LA ESTACIÓN DESPIERTA</span><h3>Tu señal hace falta.</h3><p>Elige tu traje, recupera suministros y devuelve la energía a la estación. Tu avance se guarda al jugar.</p><button type="button" class="primary" id="enter-sector">Preparar mi avatar <span aria-hidden="true">↗</span></button></div>
+          <p><a href="docentes/" id="teacher-link" hidden>Ir al observatorio docente ↗</a></p>
+          <p id="session-message" role="status"></p><button type="button" class="secondary" id="logout">Cerrar sesión <span aria-hidden="true">↗</span></button>
+        </div>
+        <div class="access-bottom"><span class="little-cross">+</span> HECHO PARA JUGAR EN EQUIPO.</div>
+      </div>
+    </section>
+  </main>
+  <footer><span>RED CERO © 2026</span><span>UN MUNDO ABIERTO. UNA NUEVA SEÑAL.</span><span>redcero.com.mx</span></footer>
+</body>
+</html>
+

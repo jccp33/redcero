@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" rx="40" fill="#0B0F19"/>
+  <!-- Anillo exterior con degradado en código/nodos -->
+  <circle cx="100" cy="100" r="60" fill="none" stroke="#1E293B" stroke-width="12"/>
+  <circle cx="100" cy="100" r="60" fill="none" stroke="#00F0FF" stroke-width="12" stroke-dasharray="377" stroke-dashoffset="100" stroke-linecap="round"/>
+  
+  <!-- Cero estético central -->
+  <text x="100" y="122" font-family="'Orbitron', 'Rajdhani', sans-serif" font-size="70" font-weight="900" fill="#F8FAFC" text-anchor="middle">0</text>
+  
+  <!-- Nodos de conexión -->
+  <circle cx="100" cy="40" r="8" fill="#00F0FF"/>
+  <circle cx="160" cy="100" r="8" fill="#10B981"/>
+  <circle cx="100" cy="160" r="8" fill="#00F0FF"/>
+  <circle cx="40" cy="100" r="8" fill="#10B981"/>
+</svg>
