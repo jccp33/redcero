@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS group_invites (
+  group_id BIGINT UNSIGNED PRIMARY KEY,
+  token_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+  created_by BIGINT UNSIGNED NOT NULL,
+  expires_at DATETIME(3) NOT NULL,
+  FOREIGN KEY (group_id) REFERENCES learning_groups(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

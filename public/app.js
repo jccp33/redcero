@@ -3,6 +3,7 @@ const $ = id => document.getElementById(id);
 // XAMPP serves the same client; Node serves the API on port 3000 locally.
 const localHost = ['localhost','127.0.0.1','192.168.1.150'].includes(location.hostname);
 const api = location.port === '3000' || !localHost ? '' : `${location.protocol}//${location.hostname}:3000`;
+let invitation=new URLSearchParams(location.hash.slice(1)).get('invitacion');
 let mode = 'login';
 let busy = false;
 const sector = createSector(request);
@@ -16,7 +17,7 @@ async function request(path, body) {
 function connected(user) {
   sector.close();
   $('auth-view').hidden = true; $('connected-view').hidden = false;
-  $('player-name').textContent = user.username;
+  $('player-name').textContent = user.username;$('crew-invitation').hidden=!invitation||user.role!=='player';$('crew-message').textContent='';
   $('teacher-link').hidden = !['teacher','admin'].includes(user.role);
   $('auth-form').reset(); $('message').textContent = '';
 }
@@ -62,3 +63,5 @@ $('logout').addEventListener('click',async () => {
 request('/auth/me').then(result => connected(result.user)).catch(error => {
   if(error.status !== 401) $('message').textContent = 'No hay conexión con la estación. Comprueba que el servidor esté encendido.';
 });
+
+$('join-crew').onclick=async()=>{if(!invitation)return;$('join-crew').disabled=true;try{const result=await request('/groups/join',{code:invitation});$('crew-message').textContent='Ya formas parte de '+result.name+'. Tu partida se conserva. ¡Continúa explorando!';invitation=null;history.replaceState(null,'',location.pathname+location.search);}catch(e){$('crew-message').textContent=e.message;$('join-crew').disabled=false;}};

@@ -1,3 +1,4 @@
+import {addGroupAccess} from './group-access.js';
 import {Router} from 'express';
 
 const mechanisms=[['supply','Suministros',['supply']],['bridge','Pasarela',['build','remove']],['coolant','Refrigeración',['flow']],['relay','Antena',['pulse','transmit']],['drone','Dron',['drone']],['hangar','Hangar',['open']]];
@@ -5,25 +6,28 @@ function progress(row) {
   const s=row.state_json?JSON.parse(row.state_json):null;
   return {started:!!s,complete:!!s?.complete,systems:s?{supply:!!s.battery,bridge:s.bridge===3,coolant:!!s.coolant,relay:!!s.relay,drone:s.drone==='done',hangar:!!s.complete}:Object.fromEntries(mechanisms.map(([k])=>[k,false])),savedAt:row.saved_at};
 }
-export function teacherRouter(db,hash) {
+export function teacherRouter(db,hash,notifyTeacher) {
   const router=Router();
   router.use(async(req,res,next)=>{
     const token=req.cookies.rc_session;
     if(!token)return res.status(401).json({error:'Inicia sesión con tu cuenta docente.'});
-    const [users]=await db.execute('SELECT u.id,u.username,u.global_role FROM users u JOIN auth_sessions s ON s.user_id=u.id WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP()',[hash(token)]);
+    const [users]=await db.execute('SELECT u.id,u.username,u.email,u.global_role FROM users u JOIN auth_sessions s ON s.user_id=u.id WHERE s.token_hash=? AND s.expires_at>UTC_TIMESTAMP()',[hash(token)]);
     const user=users[0];if(!user)return res.status(401).json({error:'Tu sesión expiró.'});
     req.teacher=user;next();
   });
   router.get('/status',async(req,res)=>{
     const [rows]=await db.execute('SELECT display_name,institution,status,created_at,reviewed_at FROM teacher_requests WHERE user_id=?',[req.teacher.id]);
-    res.json({user:{username:req.teacher.username,role:req.teacher.global_role},application:rows[0]||null});
+    res.json({user:{username:req.teacher.username,email:req.teacher.email,role:req.teacher.global_role},application:rows[0]||null});
   });
   router.post('/application',async(req,res)=>{
     if(req.teacher.global_role!=='player')return res.status(409).json({error:'Tu cuenta ya está habilitada.'});
     const name=typeof req.body.displayName==='string'?req.body.displayName.trim():'';
     const institution=typeof req.body.institution==='string'?req.body.institution.trim():'';
     if(!name||name.length>100||!institution||institution.length>150)return res.status(400).json({error:'Indica tu nombre y escuela o institución.'});
-    try{await db.execute('INSERT INTO teacher_requests (user_id,display_name,institution) VALUES (?,?,?)',[req.teacher.id,name,institution]);res.status(201).json({ok:true});}catch(e){if(e.code==='ER_DUP_ENTRY')return res.status(409).json({error:'Tu cuenta ya tiene una solicitud. Consulta su estado.'});throw e;}
+    try{await db.execute('INSERT INTO teacher_requests (user_id,display_name,institution) VALUES (?,?,?)',[req.teacher.id,name,institution]);
+      const [users]=await db.execute('SELECT username,email FROM users WHERE id=?',[req.teacher.id]);
+      const notification=await notifyTeacher('pending',{...users[0],displayName:name,institution});
+      res.status(201).json({ok:true,notification});}catch(e){if(e.code==='ER_DUP_ENTRY')return res.status(409).json({error:'Tu cuenta ya tiene una solicitud. Consulta su estado.'});throw e;}
   });
   router.use((req,res,next)=>{if(!['teacher','admin'].includes(req.teacher.global_role))return res.status(403).json({error:'Esta sección requiere aprobación docente.'});next();});
   router.get('/applications',async(req,res)=>{
@@ -43,22 +47,27 @@ export function teacherRouter(db,hash) {
       const [users]=await conn.execute('SELECT global_role FROM users WHERE id=? FOR UPDATE',[id]);
       if(users[0].global_role!=='player'){await conn.rollback();return res.status(409).json({error:'El rol cambió. Revisa esta cuenta antes de continuar.'});}
       if(decision==='approved')await conn.execute("UPDATE users SET global_role='teacher' WHERE id=?",[id]);
-      await conn.execute('UPDATE teacher_requests SET status=?,reviewed_at=UTC_TIMESTAMP(3),reviewed_by=? WHERE user_id=?',[decision,req.teacher.id,id]);await conn.commit();res.json({ok:true});
+      await conn.execute('UPDATE teacher_requests SET status=?,reviewed_at=UTC_TIMESTAMP(3),reviewed_by=? WHERE user_id=?',[decision,req.teacher.id,id]);
+      const [recipients]=await conn.execute('SELECT u.username,u.email,r.display_name FROM users u JOIN teacher_requests r ON r.user_id=u.id WHERE u.id=?',[id]);
+      await conn.commit();
+      const notification=await notifyTeacher(decision,{...recipients[0],displayName:recipients[0].display_name});
+      res.json({ok:true,notification});
     }catch(e){await conn.rollback();throw e;}finally{conn.release();}
   });
   async function allowed(req,groupId){
     if(!Number.isSafeInteger(groupId)||groupId<1)return false;
     const [rows]=req.teacher.global_role==='admin'?await db.execute('SELECT id FROM learning_groups WHERE id=?',[groupId]):await db.execute("SELECT group_id FROM group_members WHERE group_id=? AND user_id=? AND member_role='teacher'",[groupId,req.teacher.id]);return !!rows.length;
   }
+  addGroupAccess(router,db,hash,allowed);
   router.get('/groups',async(req,res)=>{
     const [groups]=req.teacher.global_role==='admin'?await db.query('SELECT id,name FROM learning_groups ORDER BY name,id'):await db.execute("SELECT g.id,g.name FROM learning_groups g JOIN group_members m ON m.group_id=g.id WHERE m.user_id=? AND m.member_role='teacher' ORDER BY g.name,g.id",[req.teacher.id]);
-    res.json({user:{username:req.teacher.username,role:req.teacher.global_role},groups});
+    res.json({user:{username:req.teacher.username,email:req.teacher.email,role:req.teacher.global_role},groups});
   });
   router.post('/groups',async(req,res)=>{
-    if(req.teacher.global_role!=='admin')return res.status(403).json({error:'Solo administración puede crear grupos.'});
     const name=typeof req.body.name==='string'?req.body.name.trim():'';
     if(!name||name.length>100)return res.status(400).json({error:'Escribe un nombre de grupo de hasta 100 caracteres.'});
-    const [result]=await db.execute('INSERT INTO learning_groups (name) VALUES (?)',[name]);res.status(201).json({id:result.insertId,name});
+    const conn=await db.getConnection();
+    try{await conn.beginTransaction();const [result]=await conn.execute('INSERT INTO learning_groups (name) VALUES (?)',[name]);await conn.execute("INSERT INTO group_members (group_id,user_id,member_role) VALUES (?,?,'teacher')",[result.insertId,req.teacher.id]);await conn.commit();res.status(201).json({id:result.insertId,name});}catch(e){await conn.rollback();throw e;}finally{conn.release();}
   });
   router.post('/groups/:id/members',async(req,res)=>{
     if(req.teacher.global_role!=='admin')return res.status(403).json({error:'Solo administración puede asignar integrantes.'});

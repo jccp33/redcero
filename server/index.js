@@ -1,3 +1,4 @@
+import {addGroupJoin} from './group-access.js';
 import express from 'express';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
@@ -7,8 +8,10 @@ import { randomBytes, createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import {sectorRouter} from './sector.js';
 import {teacherRouter} from './teacher.js';
+import {createTeacherNotifier} from './notifications.js';
 
 const app = express();
+const notifyTeacher=createTeacherNotifier();
 const db = mysql.createPool({host: process.env.DB_HOST, port: Number(process.env.DB_PORT || 3306), user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, connectionLimit: 5, timezone: 'Z'});
 const origins = new Set((process.env.APP_ORIGINS || '').split(','));
 const production = process.env.NODE_ENV === 'production';
@@ -64,7 +67,9 @@ const registerAccount = (isTeacher=false) => async (req,res) => {
     const [result] = await connection.execute("INSERT INTO users (username,email,password_hash,global_role) VALUES (?,?,?,'player')",[username,normalizedEmail,passwordHash]);
     if(isTeacher)await connection.execute('INSERT INTO teacher_requests (user_id,display_name,institution) VALUES (?,?,?)',[result.insertId,displayName,institution]);
     await connection.commit();
-    res.status(201).json(await session(req,res,{id:result.insertId,username}));
+    const account=await session(req,res,{id:result.insertId,username});
+    if(isTeacher)account.notification=await notifyTeacher('pending',{username,email:normalizedEmail,displayName,institution});
+    res.status(201).json(account);
   } catch(error) {await connection.rollback();if(error.code === 'ER_DUP_ENTRY') return res.status(409).json({error:'El alias o correo ya están registrados. Inicia sesión o revisa tus datos.'}); throw error;}finally{connection.release();}
 };
 app.post('/api/auth/register',limiter,registerAccount());
@@ -94,7 +99,8 @@ app.use('/api/sector',sectorRouter(db,async (req,res,next) => {
   if(!rows.length) return res.status(401).json({error:'Tu enlace expiró. Vuelve a iniciar sesión.'});
   req.playerId=rows[0].user_id;next();
 }));
-app.use('/api/teacher',teacherRouter(db,hash));
+addGroupJoin(app,db,hash);
+app.use('/api/teacher',teacherRouter(db,hash,notifyTeacher));
 app.use('/api', (req,res) => res.status(404).json({error:'Ruta desconocida.'}));
 app.get('/docentes/',(req,res) => res.sendFile(fileURLToPath(new URL('../docentes/index.html',import.meta.url))));
 app.get('/',(req,res) => res.sendFile(fileURLToPath(new URL('../index.html',import.meta.url))));

@@ -1,8 +1,23 @@
 # Red Cero — plan del MVP
 
-Estado: primer incremento local implementado: registro, inicio/cierre de sesión y base de datos. La configuración y el bloqueo detectado en los permisos internos de XAMPP se documentan en `../README.md`. El Sector 01 individual y el observatorio docente por grupos están implementados; la cooperación multijugador sigue pendiente. La identidad del proyecto es **Red Cero**, con dominio **redcero.com.mx**, registrado por un año para publicar y probar el MVP. El alojamiento, el DNS y HTTPS quedan pendientes de configuración y verificación. La fecha exacta de vencimiento se consultará en el registrador; no se deduce de la fecha de esta documentación.
+Estado: registro, inicio/cierre de sesión, Sector 01 individual y observatorio docente por grupos implementados localmente. La configuración de XAMPP, la reparación de su tabla de permisos y los pendientes de la cuenta SQL dedicada se documentan en `../README.md`. La cooperación multijugador sigue pendiente. La identidad del proyecto es **Red Cero**, con dominio **redcero.com.mx**, registrado por un año para publicar y probar el MVP. El alojamiento, el DNS y HTTPS quedan pendientes de configuración y verificación. La fecha exacta de vencimiento se consultará en el registrador; no se deduce de la fecha de esta documentación.
 
 ## Experiencia y alcance
+
+### Actualización de alcance — dos niveles
+
+La versión inicial debe completar Nivel 1 (entrada y evidencia diagnóstica) y Nivel 2 (nivelación, solo o en equipo). Esto amplía la propuesta de una sola misión descrita más adelante; su duración y cobertura deben volver a estimarse. Los cuatro ejes obligatorios se especifican en `prompt-maestro.md`. Propuesta para convertirlos en juego:
+
+| Eje | Situación dentro del mundo | Decisión y evidencia por diseñar |
+| --- | --- | --- |
+| Lógica y proporcionalidad | Escalar un plano y distribuir reservas entre estaciones de distinta capacidad | Elegir la relación, anticipar cantidades y ajustar repartos; incluir porcentajes y cambios de escala, no solo repetir 6/3/3. |
+| Operaciones de varios pasos | Preparar suministros para varios módulos y recuperar el sobrante | Decidir cantidades, combinar costes y calcular saldo; variar condiciones para distinguir planificación de ensayo sin estrategia. |
+| Fracciones y decimales | Trasvasar refrigerante y fabricar tramos usando instrumentos con escalas distintas | Relacionar partes con cantidades y reconocer equivalencias como un cuarto y 0.25 de una unidad. |
+| Áreas y perímetros | Delimitar un refugio y recubrir su piso con paneles | Distinguir material para el borde del necesario para la superficie; comparar diseños y manejar unidades de longitud y área. |
+
+Estas son propuestas, no mecanismos implementados. Elaborar una matriz verificable de objetivos, variantes, ayudas, evidencia y aceptación antes de construir el Nivel 2. Mantener todas las acciones posibles en solitario; en equipo registrar al autor real sin atribuir dominio individual a toda la tripulación. La misión puede completarse sin que exista evidencia suficiente sobre cada aprendizaje.
+
+El registro de jugadores es libre y los equipos de juego son independientes del seguimiento docente. Docentes aprobados deben gestionar sus grupos por alias/correo compartido por el jugador; la implementación vigente de invitaciones debe ampliarse para ese flujo conservando aislamiento. Administración mantiene acceso global de soporte.
 
 Incremento Sector 01 disponible: avatar con traje/casco/tono, mapa por casillas con controles táctiles y de teclado, suministros por coordenadas, pasarela con conservación de materiales, reparto 6/3/3 de refrigerante, patrón de pulsos 2/4/6/8, dron por gestos y apertura del hangar. Avance individual persistido en `player_sectors`; acciones de mecanismos registradas en `sector_events`. El servidor valida todas las acciones. Para esta base jugable se usa HTTP por acción y Canvas 2D; la cooperación por WebSockets del MVP completo aún no está implementada. Consultar README para jugar y verificar.
 

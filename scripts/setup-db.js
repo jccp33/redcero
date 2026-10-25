@@ -35,6 +35,8 @@ try {
     for (const statement of sql.replace(/^--.*$/gm, '').split(';').map(s => s.trim()).filter(Boolean)) await admin.query(statement);
     await admin.execute('INSERT INTO schema_migrations (name) VALUES (?)', ['004_teacher_requests']);
   }
+  const [inviteMigration]=await admin.execute('SELECT name FROM schema_migrations WHERE name=?',['005_group_invites']);
+  if(!inviteMigration.length){const sql=await readFile(new URL('../database/005_group_invites.sql',import.meta.url),'utf8');for(const statement of sql.split(';').map(s=>s.trim()).filter(Boolean))await admin.query(statement);await admin.execute('INSERT INTO schema_migrations (name) VALUES (?)',['005_group_invites']);}
   if (process.env.DB_USER === 'root') {
     if (process.env.NODE_ENV !== 'development' || process.env.DB_ALLOW_LOCAL_ROOT !== 'true') throw new Error('Root solo se admite como excepción local explícita');
     console.log(`Base ${name} preparada. Excepción root local activa; permisos mínimos pendientes.`);

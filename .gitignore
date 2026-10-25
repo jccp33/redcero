@@ -10,3 +10,11 @@ dist/
 Thumbs.db
 .vscode/
 backups/
+# Local credentials and private key containers. Keep templates without secrets.
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+.secrets/
+secrets/

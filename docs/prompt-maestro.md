@@ -15,6 +15,30 @@ A continuación, se detallan los pilares fundamentales, restricciones y requerim
 - El primer nivel funciona como un tutorial camuflado dentro de una narrativa de ciencia ficción / supervivencia cooperativa (ej. un "Nodo de Energía" o estación en emergencia).
 - Debe integrar y nivelar de forma orgánica los conocimientos matemáticos básicos de nivel primaria (coordenadas cartesianas, aritmética con números enteros, proporciones/fracciones sencillas y patrones/sucesiones numéricas) necesarios para que el estudiante pueda interactuar con el entorno y avanzar con sus amigos.
 
+### Ampliación acordada — 25 de octubre de 2026
+
+- La versión inicial publicable debe completar como mínimo dos niveles: Nivel 1 de entrada/tutorial y evidencia diagnóstica inicial; Nivel 2 de nivelación matemática, resoluble en solitario o en equipo. Es alcance por desarrollar, no una declaración de implementación ni de preparación para producción.
+- Para la regularización exprés rumbo a secundaria se requieren cuatro ejes. Importa decidir qué operaciones y estrategias usar ante una situación, no acumular operaciones mecánicas:
+  1. Lógica y reparto proporcional: proporcionalidad, regla de tres y porcentajes; referencias de diseño como descuentos y escalas de mapas.
+  2. Operaciones combinadas en problemas razonados de dos o más pasos; referencias como compras con varios precios y cálculo del cambio. Incluir agrupación y orden de operaciones cuando la situación lo requiera.
+  3. Fracciones y decimales: reparto, medición, conversiones y equivalencias, incluida `1/4 = 0.25`; referencias como porciones, longitudes y volúmenes.
+  4. Áreas y perímetros: diseñar, cercar y cubrir superficies; distinguir longitud de contorno y superficie, con unidades adecuadas. Referencias como cercas, pintura y mosaicos.
+- Estos ejes son requisitos de diseño, no prueba de cobertura completa del currículo de primaria. Delimitar objetivos y contrastar cobertura antes de prometer una nivelación integral. No presentar la regla de tres como receta obligatoria: aceptar estrategias válidas de proporcionalidad.
+- Integrarlos mediante mecanismos, recursos y consecuencias visibles del mundo, conservando la experiencia sin sensación escolar. Los ejemplos cotidianos orientan el diseño; no exigen formularios, cuestionarios, exámenes ni pantallas de ejercicios.
+- La evidencia diagnóstica debe distinguir intentos, correcciones, ayudas y autoría. Resolver una misión una vez no demuestra dominio; una solución de equipo no acredita automáticamente a todos. Permitir la conclusión «evidencia insuficiente».
+
+### Acceso y responsabilidades acordados
+
+- Jugadores: registro libre, sin invitación ni docente como requisito; podrán crear equipos de juego entre ellos. Su actividad es jugar, sin administración escolar.
+- Equipos de juego y grupos de seguimiento docente tienen propósitos distintos y no deben confundirse.
+- Docentes: cuenta por solicitud y aprobación administrativa; después crean sus grupos de seguimiento e incorporan jugadores que les compartan alias o correo. Las invitaciones pueden complementar este flujo, pero no serán obligatorias. Mantener autorización por grupo y privacidad; no habilitar exploración global de cuentas a docentes.
+- Administrador: acceso global para soporte, gestión de solicitudes y correcciones de errores y datos. Conservar cuentas, asignaciones, partidas y avances existentes.
+
+### Honestidad y publicación
+
+- Ser totalmente honesto con el usuario, incluyendo desacuerdos fundamentados; no ajustar conclusiones para darle gusto. Diferenciar propuestas, implementación, pruebas automáticas, validación real y pendientes.
+- El objetivo es una versión inicial real para publicar en un plazo corto, aún sin fecha exacta acordada. Priorizar alcance viable; comunicar límites, riesgos y bloqueos reales. Funcionar localmente no equivale a estar listo para producción. No prometer eficacia educativa, moderación, seguridad ni rendimiento sin evidencia.
+
 3. TEMÁTICAS TÉCNICAS INICIALES:
 - Matemáticas aplicadas (geometría, proporciones, lógica).
 - Lógica de programación descubierta al jugar: rutas, mecanismos y acciones de drones mediante controles visuales sencillos. La evolución a bloques o sintaxis tipo Python/JavaScript se reserva para fases posteriores, de forma opcional y gradual, sin exigir conocimientos previos ni bloquear el MVP.
