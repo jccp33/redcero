@@ -1,19 +1,20 @@
+import {createSectorOneState} from './challenge-variants.js';
 import {Router} from 'express';
 import {rateLimit} from 'express-rate-limit';
-import {act,initialState,validAvatar,sites} from './sector-rules.js';
+import {act,challengeFor,validAvatar,sites} from './sector-rules.js';
 
 export function sectorRouter(db, authenticate) {
   const router=Router();
   router.use(authenticate);
   router.use(rateLimit({windowMs:60000,limit:600,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Espera un momento antes de volver a moverte.'}}));
-  const read = row => row ? {avatar:JSON.parse(row.avatar_json),state:JSON.parse(row.state_json),version:Number(row.version),sites} : {avatar:null,sites};
+  const read = row => row ? {avatar:JSON.parse(row.avatar_json),state:JSON.parse(row.state_json),challenge:challengeFor(JSON.parse(row.state_json)),version:Number(row.version),sites} : {avatar:null,sites};
   router.get('/',async (req,res) => {
     const [rows]=await db.execute('SELECT * FROM player_sectors WHERE user_id=?',[req.playerId]);res.json(read(rows[0]));
   });
   router.post('/avatar',async (req,res) => {
     if(!validAvatar(req.body)) return res.status(400).json({error:'Elige un traje, un casco y un tono disponibles.'});
     const avatar={suit:req.body.suit,helmet:req.body.helmet,skin:req.body.skin};
-    await db.execute('INSERT INTO player_sectors (user_id,avatar_json,state_json) VALUES (?,?,?) ON DUPLICATE KEY UPDATE avatar_json=VALUES(avatar_json)',[req.playerId,JSON.stringify(avatar),JSON.stringify(initialState())]);
+    await db.execute('INSERT INTO player_sectors (user_id,avatar_json,state_json) VALUES (?,?,?) ON DUPLICATE KEY UPDATE avatar_json=VALUES(avatar_json)',[req.playerId,JSON.stringify(avatar),JSON.stringify(createSectorOneState())]);
     const [rows]=await db.execute('SELECT * FROM player_sectors WHERE user_id=?',[req.playerId]);res.json(read(rows[0]));
   });
   router.post('/action',async (req,res) => {

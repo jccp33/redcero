@@ -1,8 +1,10 @@
 export const sites = {supply:{x:-3,y:2},bridge:{x:-1,y:0},coolant:{x:2,y:2},relay:{x:3,y:-2},drone:{x:-3,y:-2},hangar:{x:5,y:0}};
 export const initialState = () => ({x:0,y:0,metal:0,battery:false,bridge:0,flows:[0,0,0],coolant:false,pulse:2,relay:false,drone:'waiting',complete:false});
+export const challengeFor=state=>state.challenge||{schemaVersion:0,coolantTotal:12,pulseTrail:[2,4,6]};
 export function validAvatar(a) {return a && ['cyan','orange','violet'].includes(a.suit) && ['round','square'].includes(a.helmet) && ['light','medium','dark'].includes(a.skin);}
 export function act(previous, command) {
   const s = structuredClone(previous);
+  const challenge=challengeFor(s),trail=challenge.pulseTrail,targetPulse=trail[2]+trail[1]-trail[0];
   const fail = message => ({state:previous,message,outcome:'retry'});
   const near = key => Math.abs(s.x-sites[key].x)+Math.abs(s.y-sites[key].y)<=1;
   let message = '';
@@ -14,7 +16,7 @@ export function act(previous, command) {
     if(x===-1 && y===0 && s.bridge<3) return fail('Faltan piezas para cruzar la pasarela. Acércate y repara.');
     s.x=x;s.y=y;
   } else if(command.type === 'hint' && Object.hasOwn(sites,command.site) && near(command.site)) {
-    message={supply:'La caja de la baliza conserva la batería. Acércate y recoge los suministros.',bridge:'Cada pieza ocupa un tramo. Si desmontas uno, recuperas su material.',coolant:'La reserva completa alimenta los tres circuitos: compara la mitad con cada cuarto.',relay:'La antena proyecta grupos de 2, 4 y 6 destellos. Observa cuánto crece cada grupo.',drone:'Señala el destino, recoge la celda al llegar y después indica volver.',hangar:'Comprueba las luces de batería, pasarela, depósitos, antena y dron.'}[command.site];
+    message={supply:'La caja de la baliza conserva la batería. Acércate y recoge los suministros.',bridge:'Cada pieza ocupa un tramo. Si desmontas uno, recuperas su material.',coolant:'La reserva completa alimenta los tres circuitos: compara la mitad con cada cuarto.',relay:`La antena proyecta grupos de ${trail.join(', ')} destellos. Observa cuánto crece cada grupo.`,drone:'Señala el destino, recoge la celda al llegar y después indica volver.',hangar:'Comprueba las luces de batería, pasarela, depósitos, antena y dron.'}[command.site];
   } else if(command.type === 'supply' && near('supply')) {
     if(s.battery) return fail('Ya recuperaste estos suministros.');
     s.battery=true;s.metal=6;message='¡Batería recuperada! Encontraste también 6 piezas para la pasarela.';
@@ -29,15 +31,15 @@ export function act(previous, command) {
     if(s.coolant) return fail('El circuito ya está estable.');
     const {index,delta}=command;
     if(!Number.isInteger(index)||index<0||index>2||![1,-1].includes(delta)) return fail('Elige una válvula.');
-    if(s.flows[index]+delta<0 || s.flows.reduce((a,b)=>a+b,0)+delta>12) return fail('No queda agua en la reserva. Cierra otra válvula para recuperarla.');
+    if(s.flows[index]+delta<0 || s.flows.reduce((a,b)=>a+b,0)+delta>challenge.coolantTotal) return fail('No queda agua en la reserva. Cierra otra válvula para recuperarla.');
     s.flows[index]+=delta;
-    if(s.flows[0]===6&&s.flows[1]===3&&s.flows[2]===3) {s.coolant=true;message='¡Flujo estable! El reactor recibe la mitad y los otros dos sistemas un cuarto cada uno.';}
+    if(s.flows[0]===challenge.coolantTotal/2&&s.flows[1]===challenge.coolantTotal/4&&s.flows[2]===challenge.coolantTotal/4) {s.coolant=true;message='¡Flujo estable! El reactor recibe la mitad y los otros dos sistemas un cuarto cada uno.';}
   } else if(command.type === 'pulse' && near('relay')) {
     if(s.relay) return fail('La antena ya transmite.');
     if(![-1,1].includes(command.delta)) return fail('Ajusta el regulador.');
     s.pulse=Math.max(1,Math.min(12,s.pulse+command.delta));
   } else if(command.type === 'transmit' && near('relay')) {
-    if(s.pulse!==8) return fail('La luz no encaja todavía. Escucha: 2… 4… 6… cada pulso crece lo mismo.');
+    if(s.pulse!==targetPulse) return fail(`La luz no encaja todavía. Escucha: ${trail.join('… ')}… cada pulso crece lo mismo.`);
     s.relay=true;message='¡Señal enlazada! La antena vuelve a respirar.';
   } else if(command.type === 'drone' && near('drone')) {
     if(!['go','collect','return'].includes(command.step)) return fail('Elige un gesto para el dron.');

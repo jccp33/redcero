@@ -55,6 +55,13 @@ Implementar antes de continuar con el pulido de los niveles y el juego en equipo
 - Limitar solicitudes, reenvíos e intentos de código, evitar revelar públicamente si una cuenta existe, invalidar códigos usados o reemplazados y revocar sesiones anteriores tras completar la recuperación. Para cambio autenticado, renovar la sesión actual y revocar las demás. No registrar secretos de recuperación en logs ni incluirlos en telemetría del juego.
 - Probar canales independientes, errores del proveedor, códigos inválidos/caducados/reutilizados, intentos simultáneos, validaciones de contraseña, revocación de sesiones, aislamiento de cuentas y conservación de partidas. Los fallos de envío no deben bloquear el acceso con la contraseña vigente ni afirmarse como entrega confirmada.
 
+### Retos variables y guía docente
+
+- Los retos no deben repetir siempre los mismos valores. Introducir aleatoriedad controlada en nuevas partidas, preservando el objetivo matemático, los límites de los controles y la posibilidad de resolverlos. Mantener constantes los elementos de orientación necesarios para aprender a jugar.
+- Asignar variantes en el servidor al crear la partida y persistir todos sus parámetros. No sortear otra solución al recargar, reconectar, cambiar avatar, pedir ayuda o fallar. Las partidas existentes conservan parámetros y progreso anteriores; no reiniciarlas ni cambiar sus respuestas por incorporar aleatoriedad.
+- Guardar en evidencia la configuración/variante real y su versión. No equiparar estadísticamente variantes de dificultad distinta sin validación. En el futuro, una nueva expedición o partida cooperativa debe tener su propia asignación compartida; no usar sorteos independientes por participante en un mismo mecanismo.
+- Cada docente debe disponer de su propia guía de usuario dentro del observatorio, independiente de los tutoriales de jugadores: solicitud/aprobación, grupos propios, incorporación por alias/correo, invitaciones, lectura responsable de estadísticas, cuidado y recuperación de cuenta, soporte y límites de la versión. Debe ser legible en móvil, accesible con teclado y consultable nuevamente cuando se necesite.
+
 3. TEMÁTICAS TÉCNICAS INICIALES:
 - Matemáticas aplicadas (geometría, proporciones, lógica).
 - Lógica de programación descubierta al jugar: rutas, mecanismos y acciones de drones mediante controles visuales sencillos. La evolución a bloques o sintaxis tipo Python/JavaScript se reserva para fases posteriores, de forma opcional y gradual, sin exigir conocimientos previos ni bloquear el MVP.

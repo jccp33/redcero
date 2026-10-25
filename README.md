@@ -8,6 +8,12 @@ Disponible localmente: registro con alias, correo privado y contraseña, sesione
 
 ## Jugar el Sector 01
 
+### Variantes de retos
+
+Las partidas nuevas reciben una configuración aleatoria del servidor, guardada con su estado. El Sector 01 varía la reserva de refrigeración (12, 16 o 20) y la secuencia de pulsos; baliza, pasarela y gestos iniciales mantienen su orientación. El Sector 02 sortea dos situaciones diferentes por cada instalación, con escalas, porcentajes, pedidos, presupuestos, capacidades, fracciones y dimensiones dentro de límites resolubles. Las instrucciones y validaciones usan esos parámetros, no números fijos.
+
+Recargar, cambiar traje, pedir ayuda o volver a entrar no cambia la variante. Las partidas anteriores sin configuración explícita siguen usando sus valores originales, sin migración ni reescritura de sus estados. Se guarda la configuración real en la evidencia nueva; no se certifica equivalencia pedagógica entre variantes. Todavía no hay una función de reinicio/nueva expedición: este cambio no borra ni vuelve a sortear una partida existente.
+
 La estación muestra maquinaria y conducciones que se iluminan al restaurar sistemas. Los objetivos se pueden marcar en el mapa sin bloquear el orden de exploración. La orientación inicial se retira al caminar; «Ver señal de ayuda» proyecta una demostración y registra la consulta sin resolver el mecanismo. Los gestos del dron se habilitan según su estado. El hangar completado ofrece viaje directo al Sector 02. Movimiento visual suavizado sobre posiciones aceptadas por servidor y animaciones con preferencia de movimiento reducido.
 
 Resumen del corte y pendientes: [corte de niveles y cuenta](docs/corte-niveles-cuenta.md).
@@ -34,7 +40,7 @@ Iniciar sesión y pulsar **Preparar mi avatar**. Elegir traje, casco y tono de p
 
 En móvil: tocar el suelo para caminar o mantener las flechas táctiles; acercarse a un mecanismo y tocar «Explorar». En computadora: flechas/WASD y E. También se puede tocar un mecanismo cercano en el mapa. No hace falta escribir código. La pantalla funciona en vertical y reorganiza los mecanismos debajo del mapa en pantallas pequeñas.
 
-Recorrido: encontrar suministros en (−3, +2), colocar tres piezas de pasarela, repartir 12 depósitos entre reactor/escudo/antena en mitades y cuartos, restaurar el patrón de pulsos y guiar un dron mediante «Ir», «Recoger» y «Volver». El hangar se abre al restaurar los sistemas. Se puede recuperar material y ajustar válvulas para volver a intentar sin reiniciar la partida.
+Recorrido: encontrar suministros en (−3, +2), colocar tres piezas de pasarela, repartir la reserva indicada entre reactor/escudo/antena en mitades y cuartos, restaurar el patrón de pulsos asignado y guiar un dron mediante «Ir», «Recoger» y «Volver». El hangar se abre al restaurar los sistemas. Se puede recuperar material y ajustar válvulas para volver a intentar sin reiniciar la partida. En partidas antiguas, la reserva sigue siendo 12 y el patrón 2/4/6/8.
 
 `003_sector_one.sql` agrega `player_sectors` (avatar y estado por jugador) y `sector_events` (acciones de mecanismos y resultado, sin movimientos ni correo). Ya está aplicada en esta instalación. Para otra instalación ejecutar `npm run db:setup`. Cada acción aceptada o intento se procesa con sesión autenticada; posición, recursos y objetivos se validan en el servidor y el estado se guarda en una transacción con control de versión. No hay guardado anónimo ni dependencia de localStorage.
 
@@ -108,6 +114,8 @@ Implementado con la migración aditiva `007_account_security`: teléfono mexican
 El resumen del incremento preparado para commit está en [registro de la sesión](docs/registro-2026-10-25.md). El alcance aprobado de dos niveles y la separación entre equipos de juego y grupos docentes están en [requisitos](docs/prompt-maestro.md); no todo ese alcance está implementado.
 
 ### Gestión de grupos por docentes
+
+El observatorio incluye «Guía docente · empieza aquí», desplegable accesible y disponible antes/después de iniciar sesión. Explica registro y aprobación, creación y asignación de grupos, alias/correo, invitaciones, estadísticas y recuperación de cuenta. La versión documental está en [guia-docente.md](docs/guia-docente.md). Consultar la guía no concede permisos ni acceso a datos.
 
 La migración compatible `005_group_invites` agrega invitaciones sin modificar partidas ni asignaciones previas. Docentes aprobados crean grupos y quedan vinculados a ellos en una transacción. Pueden generar un enlace de invitación válido por siete días, reemplazarlo o revocarlo, y quitar estudiantes de sus grupos sin borrar cuentas, eventos ni partidas. El código aleatorio se guarda solo como hash. Revocar no expulsa a integrantes actuales. Al abrir el enlace del docente, el jugador conecta su cuenta y acepta la invitación desde la bienvenida; su progreso individual se conserva. Los docentes también pueden agregar estudiantes por alias o correo exacto compartido por el jugador, solo a sus grupos. No hay búsqueda global ni autocompletado de cuentas. La asignación de docentes permanece reservada a administración; agregar un jugador conserva sus otras pertenencias y partidas.
 

@@ -5,11 +5,13 @@ export const missions={
   water:[{capacity:1000,numerator:1,denominator:4},{capacity:2000,numerator:3,denominator:4}],
   shelter:[{width:4,height:3},{width:6,height:2}]
 };
+export const missionsFor=state=>state.missions||missions;
 export const initialState=()=>({x:0,y:0,progress:{route:0,workshop:0,water:0,shelter:0},controls:{segments:0,power:0,panels:0,connectors:0,shield:0,ml:0,width:1,height:1,edge:0,tiles:0},hints:{route:0,workshop:0,water:0,shelter:0},complete:false});
 const ranges={segments:[0,12],power:[0,40],panels:[0,8],connectors:[0,8],shield:[0,30],ml:[0,2000],width:[1,8],height:[1,8],edge:[0,40],tiles:[0,64]};
 const fields={route:['segments','power'],workshop:['panels','connectors','shield'],water:['ml'],shelter:['width','height','edge','tiles']};
 export function act(previous,c){
   const s=structuredClone(previous),fail=message=>({state:previous,message,outcome:'retry'});
+  const missions=missionsFor(s);
   if(!c||typeof c!=='object')return fail('La señal no llegó. Inténtalo de nuevo.');
   if(c.type==='move'){
     if(!Number.isInteger(c.dx)||!Number.isInteger(c.dy)||Math.abs(c.dx)+Math.abs(c.dy)!==1)return fail('Elige una dirección.');

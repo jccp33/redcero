@@ -44,14 +44,15 @@ test('registro, acceso, persistencia y revocación de sesión',async () => {
     assert.equal((await (await sectorSend('/')).json()).avatar,null);
     assert.equal((await sectorSend('/avatar',{suit:'invalid'})).status,400);
     const profile=await (await sectorSend('/avatar',{suit:'cyan',helmet:'round',skin:'medium'})).json();
-    assert.equal(profile.state.x,0);
+    assert.equal(profile.state.x,0);const assignedChallenge=structuredClone(profile.challenge);
+    assert.deepEqual((await (await sectorSend('/')).json()).challenge,assignedChallenge);
     assert.equal((await sectorSend('/action',{type:'move',dx:1,dy:0,version:profile.version-1})).status,409);
     const moved=await (await sectorSend('/action',{type:'move',dx:1,dy:0,version:profile.version})).json();
     assert.equal(moved.state.x,1);
     const denied=await (await sectorSend('/action',{type:'supply',version:moved.version})).json();
     assert.equal(denied.state.battery,false);
     const edited=await (await sectorSend('/avatar',{suit:'violet',helmet:'square',skin:'dark'})).json();
-    assert.equal(edited.state.x,1,'editar avatar conserva progreso');
+    assert.equal(edited.state.x,1,'editar avatar conserva progreso');assert.deepEqual(edited.challenge,assignedChallenge);
     assert.equal(edited.avatar.suit,'violet');
     assert.equal((await (await sectorSend('/')).json()).state.x,1,'progreso persistido');
     let game=edited;
@@ -64,8 +65,8 @@ test('registro, acceso, persistencia y revocación de sesión',async () => {
     };
     await walk(-3,2);const beforeHelp=structuredClone(game.state);await play({type:'hint',site:'supply'});assert.deepEqual(game.state,beforeHelp);const [helps]=await db.execute("SELECT COUNT(*) AS total FROM learning_evidence WHERE user_id=? AND action='hint' AND mechanism_key='supply'",[me.user.id]);assert.equal(helps[0].total,1);await play({type:'supply'});assert.equal(game.state.metal,6);
     await walk(-1,1);for(let i=0;i<3;i++)await play({type:'build'});
-    await walk(2,2);for(const [index,count]of [[0,6],[1,3],[2,3]])for(let i=0;i<count;i++)await play({type:'flow',index,delta:1});
-    await walk(3,-2);for(let i=0;i<6;i++)await play({type:'pulse',delta:1});await play({type:'transmit'});
+    await walk(2,2);for(const [index,count]of [[0,game.challenge.coolantTotal/2],[1,game.challenge.coolantTotal/4],[2,game.challenge.coolantTotal/4]])for(let i=0;i<count;i++)await play({type:'flow',index,delta:1});
+    await walk(3,-2);const trail=game.challenge.pulseTrail,target=trail[2]+trail[1]-trail[0];while(game.state.pulse!==target)await play({type:'pulse',delta:Math.sign(target-game.state.pulse)});await play({type:'transmit'});
     await walk(-3,-2);for(const step of ['go','collect','return'])await play({type:'drone',step});
     await walk(5,0);await play({type:'open'});assert.equal(game.state.complete,true,'sector completo por API');
     assert.equal((await (await sectorSend('/')).json()).state.complete,true,'final guardado');

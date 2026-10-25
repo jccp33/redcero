@@ -1,8 +1,21 @@
 # Continuidad para la siguiente sesión
 
-Actualizado: 25 de octubre de 2026. Corte solicitado por el usuario tras terminar el pulido visual y jugable del Sector 01. Este archivo describe el estado actual; para historia anterior consultar registro-2026-10-25.md y corte-niveles-cuenta.md. Verificar Git, servicios y base al retomar.
+Actualizado: 25 de octubre de 2026, al cerrar la sesión por petición del usuario. Este archivo guarda el contexto para continuar; para historia anterior consultar registro-2026-10-25.md y corte-niveles-cuenta.md. Verificar Git, servicios y base al retomar.
+
+## Punto exacto para retomar
+
+- El usuario solicitó commit y push de las variantes aleatorias, la guía docente y estas notas de cierre. Este es el corte «feat: variar retos y agregar guía docente»; consultar `git log -1` y el estado remoto al retomar. El corte anterior es `0aeb536` — `feat: ampliar niveles y seguridad de cuentas`.
+- Última verificación: 18 pruebas aprobadas y Chrome completó Sector 01 con variante y abrió la guía docente en tamaño móvil. API local responde `ok` al cerrar. No repetir pruebas ni generar envíos reales solo para retomar si no hay cambios o problemas nuevos.
+- Próxima implementación: **pulir Sector 02**, manteniendo sus variantes y persistencia. Hacer que rutas, cargamentos, líquidos y construcción respondan más en el mundo, reducir texto y pulsaciones repetitivas y añadir demostraciones/pistas progresivas sin resolver automáticamente. Verificar todas sus instalaciones desde interfaz, guardado y recuperación.
+- Después: reforzar diagnóstico y observatorio, distinguiendo avance, ayudas y evidencia disponible sin equiparar finalización con aprendizaje demostrado.
+- Luego: equipos libres y cooperación en ambos niveles **con chat en tiempo real desde la primera entrega**, incluyendo autorización por sala, moderación, bloqueo/silencio, reportes y revisión administrativa.
+- No ampliar el alcance con nuevas funciones antes de cerrar esos bloques. Mantener pendientes de publicación y seguridad que aparecen más abajo.
+- Pruebas reales del usuario con sus laptops/celulares al completar los dos niveles y el flujo cooperativo acordado, incluyendo recuperación de cuenta, guardado, reconexión y notificaciones. No solicitar pruebas manuales parciales en la siguiente sesión.
+- El commit y push de este corte fueron solicitados explícitamente al cerrar. No implican despliegue público ni autorización para futuros commits automáticos.
 
 ## Acuerdos que se conservan
+
+- Requisitos nuevos: retos con aleatoriedad controlada para partidas nuevas, persistencia de configuración y compatibilidad con partidas anteriores; guía propia para docentes en el observatorio. Implementados e incluidos en el corte de variantes y guía docente posterior a 0aeb536.
 
 - Experiencia de videojuego atractiva, sin cursos, cuestionarios ni programación textual para entrar. Cero conocimientos previos. Matemáticas mediante decisiones y consecuencias del mundo.
 - Jugadores se registran y juegan libremente; equipos de juego independientes de los grupos docentes. Docentes aprobados crean grupos e incorporan jugadores por alias/correo exacto compartido. Administración conserva acceso global para soporte y correcciones.
@@ -10,9 +23,17 @@ Actualizado: 25 de octubre de 2026. Corte solicitado por el usuario tras termina
 - El primer modo jugable en equipos debe incluir chat en tiempo real, permisos por sala, moderación y herramientas de protección. No posponerlo unilateralmente.
 - El usuario hará pruebas reales con sus laptops y celulares cuando estén completos ambos niveles; no solicitar pruebas manuales parciales. Continuar verificaciones automáticas.
 - Honestidad explícita sobre implementación, pruebas y pendientes. No confundir desarrollo local con preparación para producción. No hay fecha exacta de lanzamiento acordada.
-- Conservar cuentas, claves, grupos, partidas y evidencia existentes. No versionar secretos ni respaldos. No hacer commits o despliegues solo por retomar: este corte sí fue solicitado con commit y push.
+- Conservar cuentas, claves, grupos, partidas y evidencia existentes. No versionar secretos ni respaldos. No hacer commits o despliegues solo por retomar: los cortes `0aeb536` y el de variantes/guía sí fueron solicitados con commit/push. No extender esa autorización automáticamente a cambios futuros.
 
 ## Disponible al cerrar este corte
+
+### Incremento posterior al corte 0aeb536: variantes y guía docente
+
+- `server/challenge-variants.js` asigna configuración al crear partidas: Sector 01 varía reserva/pulsos; Sector 02 sortea dos configuraciones diferentes por instalación. Se guarda en JSON de estado, sin nueva migración. Lecturas y acciones de partidas antiguas usan valores originales sin reescribirlos. Cambiar avatar tampoco vuelve a sortear. El cliente no fija las respuestas del servidor.
+- UI, ayudas y niveles de depósitos del Sector 01 usan los valores asignados. Sector 02 devuelve y valida sus misiones persistidas; evidencia versión 2 incluye la configuración de la situación, además de su índice. Las configuraciones de Sector 01 aparecen en sus snapshots de evidencia.
+- Guía desplegable «Guía docente · empieza aquí» en el observatorio, antes/después del acceso, legible en móvil y mediante teclado. Documento complementario `guia-docente.md`. Incluye aprobación, grupos, alias/correo, invitaciones, estadísticas, cuenta y límites; no cambia permisos.
+- 18 pruebas aprobadas, sin envíos reales: conservación de retos antiguos, variantes resolubles dentro de controles, situaciones diferentes, parámetros que sobreviven a lecturas/cambio de avatar, recorrido API de ambos niveles y regresión de seguridad/grupos. Chrome completó Sector 01 con variante y comprobó la guía abierta a 390 px sin desbordamiento ni excepciones JS. Cuenta temporal eliminada.
+- Pendientes específicos: validar dificultad/equivalencia de variantes y nuevas situaciones del Sector 02 en interfaz; considerar más adelante nuevas expediciones sin borrar el progreso anterior. No hay botón de reiniciar/sortear de nuevo una partida existente. Cooperación futura deberá compartir una configuración por sala. Se mantiene el acuerdo de pruebas reales del usuario al completar ambos niveles.
 
 - Registro/login de jugadores y solicitud/aprobación/rechazo de docentes; estadísticas por grupo y acceso administrativo de soporte. Cuenta local admin_local conservada junto con docente_local; contraseñas fuera del repositorio. Mi cuenta muestra datos privados del titular; destinatarios administrativos de avisos son independientes.
 - Docentes crean sus grupos, agregan jugadores por alias/correo exacto, comparten invitaciones de siete días, las reemplazan/revocan y retiran integrantes sin borrar cuentas ni partidas. No hay búsqueda global de jugadores ni asignación de docentes por otros docentes.

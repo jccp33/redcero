@@ -4,6 +4,8 @@ Matriz actualizada el 25 de octubre de 2026. No es certificación curricular ni 
 
 ## Nivel 1 — La estación despierta
 
+Variantes implementadas para nuevas partidas: reserva de refrigeración 12/16/20 y patrones crecientes de pulsos seleccionados por servidor. La configuración permanece fija en esa partida; el tutorial de movimiento, coordenadas, pasarela y gestos conserva su estructura. Las partidas antiguas mantienen los parámetros originales. No hay reinicio de expedición todavía.
+
 Objetivo: entrar sin experiencia previa, aprender controles jugando y reunir evidencia inicial. Conservar baliza, pasarela, refrigeración, pulsos, dron y hangar actuales. No exigir programación ni seleccionar nombres de operaciones. El hangar abierto sigue significando misión terminada, no dominio demostrado.
 
 | Mecanismo actual | Evidencia disponible | Falta para diagnóstico inicial |
@@ -18,6 +20,8 @@ Objetivo: entrar sin experiencia previa, aprender controles jugando y reunir evi
 Implementado: ayudas visuales opcionales registradas por mecanismo con validación de proximidad; se conservan eventos anteriores. La estación tiene objetivos marcables, orientación inicial no bloqueante y transición al Sector 02. Pendiente: ampliar variantes y criterios diagnósticos, y distinguir suficiencia de evidencia sin atribuir dominio por finalización. Las partidas completadas conservarán su estado y podrán figurar con evidencia diagnóstica insuficiente. No inventar eventos históricos.
 
 ## Nivel 2 — Reconstrucción del enlace
+
+Implementado sorteo persistente de dos configuraciones distintas por instalación. Los ejemplos de la tabla siguiente ilustran objetivos, no valores universales: la misión real usa los parámetros guardados. Variantes acotadas para que sus respuestas sean representables por los controles; su equivalencia pedagógica necesita validación. El servidor y la evidencia usan la configuración asignada, ignorando parámetros de reto que intente enviar el cliente.
 
 Propuesta: recuperar un puesto de enlace mediante cuatro zonas que permiten explorar y corregir decisiones. La misma misión debe ser resoluble por una persona o un equipo. El desarrollo inicial será individual; el modo cooperativo no está implementado y requerirá permisos de sala, sincronización, recursos compartidos y atribución individual.
 

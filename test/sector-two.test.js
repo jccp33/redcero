@@ -35,20 +35,20 @@ test('API Sector 02: desbloqueo, carrera de versiones, persistencia, evidencia y
     await db.execute('INSERT INTO auth_sessions (token_hash,user_id,expires_at) VALUES (?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR))',[createHash('sha256').update(token).digest('hex'),id]);
     assert.equal((await call('',undefined,false)).status,401);assert.equal((await call('/start',{})).status,403);
     const old=JSON.stringify({complete:true,x:5,y:0,metal:3});await db.execute('INSERT INTO player_sectors (user_id,avatar_json,state_json,version) VALUES (?,?,?,93)',[id,JSON.stringify({suit:'cyan',helmet:'round',skin:'medium'}),old]);
-    let data=await (await call('/start',{})).json();assert.equal(data.version,1);
+    let data=await (await call('/start',{})).json();assert.equal(data.version,1);const assignedMissions=structuredClone(data.missions);assert.deepEqual((await (await call('')).json()).missions,assignedMissions);
     const concurrent=await Promise.all([call('/action',{type:'move',dx:1,dy:0,version:1}),call('/action',{type:'move',dx:1,dy:0,version:1})]);assert.deepEqual(concurrent.map(r=>r.status).sort(),[200,409]);
     data=await (await call('')).json();
     const apply=async command=>{const r=await call('/action',{...command,version:data.version});assert.equal(r.status,200);data=await r.json();return data;};
     const travel=async key=>{const target=sites[key];while(data.state.x!==target.x)await apply({type:'move',dx:Math.sign(target.x-data.state.x),dy:0});while(data.state.y!==target.y)await apply({type:'move',dx:0,dy:Math.sign(target.y-data.state.y)});};
     for(const key of Object.keys(missions)){
       await travel(key);await apply({type:'hint',site:key});
-      for(const m of missions[key]){
+      for(const m of data.missions[key]){
         for(const [field,target]of Object.entries(solution(key,m)))while(data.state.controls[field]!==target)await apply({type:'adjust',site:key,field,delta:Math.sign(target-data.state.controls[field])});
         await apply({type:'activate',site:key});
       }
     }
     await travel('gate');await apply({type:'activate',site:'gate'});assert.equal(data.state.complete,true);
-    const restored=await (await call('/start',{})).json();assert.deepEqual(restored.state,data.state);assert.equal(restored.version,data.version);
+    const restored=await (await call('/start',{})).json();assert.deepEqual(restored.state,data.state);assert.deepEqual(restored.missions,assignedMissions);assert.equal(restored.version,data.version);
     const [evidence]=await db.execute("SELECT COUNT(*) AS total FROM learning_evidence WHERE user_id=? AND action='hint'",[id]);assert.equal(evidence[0].total,4);
     const [legacy]=await db.execute('SELECT state_json,version FROM player_sectors WHERE user_id=?',[id]);assert.equal(legacy[0].state_json,old);assert.equal(Number(legacy[0].version),93);
   }finally{if(id)await db.execute('DELETE FROM users WHERE id=?',[id]);await db.end();}

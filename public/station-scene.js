@@ -26,7 +26,7 @@ export function drawStation(ctx,data,paintAvatar,{time=0,marked=null,position=nu
   ctx.fillStyle=s.battery?'#233f43':'#9cebf0';ctx.fillRect(p.supply.x+5,p.supply.y-12,18,30);ctx.fillStyle='#123342';ctx.fillRect(p.supply.x+10,p.supply.y-17,8,5);
   ctx.strokeStyle=s.battery?'#43e1ad':'#00edff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.supply.x,p.supply.y,34+Math.sin(time/350)*3,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
   // Three actual coolant tanks, with levels tied to the accepted server state.
-  for(let i=0;i<3;i++){const x=p.coolant.x-29+i*21,y=p.coolant.y-21;ctx.fillStyle='#0a1929';ctx.fillRect(x,y,17,43);ctx.strokeStyle='#91b8c5';ctx.strokeRect(x,y,17,43);const h=s.flows[i]/12*37;ctx.fillStyle=s.coolant?'#3cd6ac':'#00b9e2';ctx.fillRect(x+3,y+40-h,11,h);}
+  for(let i=0;i<3;i++){const x=p.coolant.x-29+i*21,y=p.coolant.y-21;ctx.fillStyle='#0a1929';ctx.fillRect(x,y,17,43);ctx.strokeStyle='#91b8c5';ctx.strokeRect(x,y,17,43);const h=s.flows[i]/(s.challenge?.coolantTotal||12)*37;ctx.fillStyle=s.coolant?'#3cd6ac':'#00b9e2';ctx.fillRect(x+3,y+40-h,11,h);}
   // Antenna and its visible repeating light groups.
   line(ctx,[{x:p.relay.x,y:p.relay.y+22},{x:p.relay.x,y:p.relay.y-15}],'#9ab9cb',6);
   ctx.strokeStyle=s.relay?'#42e6b3':'#5dcce7';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.relay.x,p.relay.y-20,22,0,Math.PI);ctx.stroke();
