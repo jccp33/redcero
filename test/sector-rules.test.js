@@ -31,3 +31,12 @@ test('recorrido completo conserva materiales y exige los mecanismos',()=>{
   for(const step of ['go','collect','return'])apply({type:'drone',step});assert.equal(s.drone,'done');
   at('hangar');apply({type:'open'});assert.ok(s.complete);
 });
+
+test('señales de ayuda requieren proximidad y no resuelven mecanismos ni gastan recursos',()=>{
+  for(const site of Object.keys(sites)){
+    const s={...initialState(),...sites[site]},before=structuredClone(s);
+    const result=act(s,{type:'hint',site});assert.equal(result.outcome,'accepted');assert.ok(result.message);assert.deepEqual(result.state,before);assert.deepEqual(s,before);
+  }
+  assert.equal(act(initialState(),{type:'hint',site:'supply'}).outcome,'retry');
+  assert.equal(act(initialState(),{type:'hint',site:'__proto__'}).outcome,'retry');
+});

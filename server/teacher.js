@@ -1,3 +1,4 @@
+import {rateLimit} from 'express-rate-limit';
 import {addGroupAccess} from './group-access.js';
 import {Router} from 'express';
 
@@ -69,11 +70,11 @@ export function teacherRouter(db,hash,notifyTeacher) {
     const conn=await db.getConnection();
     try{await conn.beginTransaction();const [result]=await conn.execute('INSERT INTO learning_groups (name) VALUES (?)',[name]);await conn.execute("INSERT INTO group_members (group_id,user_id,member_role) VALUES (?,?,'teacher')",[result.insertId,req.teacher.id]);await conn.commit();res.status(201).json({id:result.insertId,name});}catch(e){await conn.rollback();throw e;}finally{conn.release();}
   });
-  router.post('/groups/:id/members',async(req,res)=>{
-    if(req.teacher.global_role!=='admin')return res.status(403).json({error:'Solo administración puede asignar integrantes.'});
+  router.post('/groups/:id/members',rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Demasiadas asignaciones. Espera unos minutos antes de continuar.'}}),async(req,res)=>{
     const groupId=Number(req.params.id);if(!await allowed(req,groupId))return res.status(404).json({error:'Grupo no disponible.'});
     const identifier=typeof req.body.identifier==='string'?req.body.identifier.trim():'';
     const role=req.body.role;
+    if(req.teacher.global_role!=='admin'&&role!=='player')return res.status(403).json({error:'Solo administración puede asignar docentes. Selecciona un estudiante.'});
     if(!identifier||identifier.length>254||!['player','teacher'].includes(role))return res.status(400).json({error:'Indica alias o correo y el tipo de integrante.'});
     const [users]=await db.execute('SELECT id,global_role FROM users WHERE username=? OR email=?',[identifier,identifier.toLowerCase()]);
     if(users.length!==1)return res.status(404).json({error:'No se encontró una cuenta única con esos datos.'});
@@ -105,6 +106,16 @@ export function teacherRouter(db,hash,notifyTeacher) {
     const student=students[0];const p=progress(student);
     const systems=mechanisms.map(([key,label,actions])=>({key,label,restored:p.systems[key],accepted:counts.filter(c=>actions.includes(c.action)&&c.outcome==='accepted').reduce((a,c)=>a+Number(c.total),0),retry:counts.filter(c=>actions.includes(c.action)&&c.outcome==='retry').reduce((a,c)=>a+Number(c.total),0)}));
     res.json({student:{id:student.id,username:student.username,email:student.email,...p},systems,events,totalEvents:counts.reduce((a,c)=>a+Number(c.total),0),offset});
+  });
+  router.get('/students/:id/evidence',async(req,res)=>{
+    const groupId=Number(req.query.groupId),id=Number(req.params.id);
+    if(!Number.isSafeInteger(id)||id<1||!await allowed(req,groupId))return res.status(404).json({error:'Estudiante no disponible.'});
+    const [members]=await db.execute("SELECT user_id FROM group_members WHERE group_id=? AND user_id=? AND member_role='player'",[groupId,id]);
+    if(!members.length)return res.status(404).json({error:'Estudiante no disponible.'});
+    const [sectors]=await db.execute('SELECT state_json,saved_at FROM player_sector_two WHERE user_id=?',[id]);
+    const [summary]=await db.execute('SELECT level_key,mechanism_key,action,outcome,COUNT(*) AS total FROM learning_evidence WHERE user_id=? GROUP BY level_key,mechanism_key,action,outcome',[id]);
+    const [events]=await db.execute('SELECT level_key,mechanism_key,action,outcome,details_json,occurred_at FROM learning_evidence WHERE user_id=? ORDER BY id DESC LIMIT 30',[id]);
+    res.json({sectorTwo:sectors.length?{state:JSON.parse(sectors[0].state_json),savedAt:sectors[0].saved_at}:null,summary,events:events.map(e=>({...e,details:JSON.parse(e.details_json),details_json:undefined})),assessment:'Evidencia observacional; completar la misión no acredita dominio. Los eventos anteriores a esta instrumentación no se reconstruyen.'});
   });
   return router;
 }

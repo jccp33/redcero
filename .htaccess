@@ -1,9 +1,12 @@
 Options -Indexes
 RewriteEngine On
+RewriteRule ^public/station-scene\.js$ - [L]
+RewriteRule ^public/(?:account\.css|account\.js)$ - [L]
 RewriteRule ^docentes/(?:index\.html)?$ - [L]
 RewriteRule ^public/(?:teacher\.css|teacher\.js)$ - [L]
 RewriteRule ^(?:$|index\.html$|public/(?:style\.css|app\.js)$) - [L]
 RewriteRule ^public/(?:sector\.css|sector\.js)$ - [L]
+RewriteRule ^public/(?:sector-two\.css|sector-two\.js)$ - [L]
 RewriteRule ^public/fonts/(?:rajdhani-latin-600-normal\.woff2|inter-latin-400-normal\.woff2|rajdhani-LICENSE\.txt|inter-LICENSE\.txt)$ - [L]
 RewriteRule ^public/assets/(?:logotipo|isotipo)\.svg$ - [L]
 RewriteRule ^ - [F,L]

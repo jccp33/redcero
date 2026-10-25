@@ -1,94 +1,49 @@
 # Continuidad para la siguiente sesión
 
-Resumen consolidado del incremento y texto propuesto para commit: [registro del 25 de octubre](registro-2026-10-25.md). Las notas históricas de esta sesión no sustituyen la comprobación del estado real.
+Actualizado: 25 de octubre de 2026. Corte solicitado por el usuario tras terminar el pulido visual y jugable del Sector 01. Este archivo describe el estado actual; para historia anterior consultar registro-2026-10-25.md y corte-niveles-cuenta.md. Verificar Git, servicios y base al retomar.
 
-## Reparación de XAMPP — 25 de octubre de 2026
+## Acuerdos que se conservan
 
-- MariaDB se cerraba al iniciar por corrupción de `mysql.db`, confirmada en eventos de Windows. El archivo `db.MAD` contenía texto de registros, no páginas de datos recuperables.
-- Respaldo físico completo, con hashes verificados antes de intervenir: `backups/xampp-mysql-20261025-012841/` (excluido de Git; contiene datos sensibles).
-- La reparación aislada no recuperó filas. Se restauraron únicamente `mysql/db.MAD` y `mysql/db.MAI` desde `C:/xampp/mysql/backup/mysql/`; la definición `db.frm` coincide por SHA-256. Se conservaron las cuentas de `global_priv` y las bases de proyectos. Los permisos personalizados por base de la tabla dañada deben volver a configurarse si se necesitan.
-- `CHECK TABLE mysql.db, mysql.global_priv` y la comprobación de todas las tablas de `redcero_dev` dieron OK. Reinicio limpio verificado y `/api/health` responde `ok`. Se comprobaron 4 usuarios, 2 partidas y 91 eventos del sector. MariaDB quedó encendido.
-- Esto sustituye las notas anteriores sobre `mysql.db` todavía dañada. Sigue pendiente habilitar y verificar `redcero_app` y retirar la conexión temporal root; no se modificó `.env` en esta reparación.
+- Experiencia de videojuego atractiva, sin cursos, cuestionarios ni programación textual para entrar. Cero conocimientos previos. Matemáticas mediante decisiones y consecuencias del mundo.
+- Jugadores se registran y juegan libremente; equipos de juego independientes de los grupos docentes. Docentes aprobados crean grupos e incorporan jugadores por alias/correo exacto compartido. Administración conserva acceso global para soporte y correcciones.
+- Primera versión publicable con dos niveles: entrada/tutorial y evidencia diagnóstica inicial; nivelación con proporcionalidad/porcentajes, operaciones razonadas de varios pasos, fracciones/decimales y áreas/perímetros. No prometer cobertura integral de primaria ni dominio por completar misiones.
+- El primer modo jugable en equipos debe incluir chat en tiempo real, permisos por sala, moderación y herramientas de protección. No posponerlo unilateralmente.
+- El usuario hará pruebas reales con sus laptops y celulares cuando estén completos ambos niveles; no solicitar pruebas manuales parciales. Continuar verificaciones automáticas.
+- Honestidad explícita sobre implementación, pruebas y pendientes. No confundir desarrollo local con preparación para producción. No hay fecha exacta de lanzamiento acordada.
+- Conservar cuentas, claves, grupos, partidas y evidencia existentes. No versionar secretos ni respaldos. No hacer commits o despliegues solo por retomar: este corte sí fue solicitado con commit y push.
 
-Actualizado: 25 de octubre de 2026. El usuario pidió continuar estas tareas. Este archivo distingue comprobaciones realizadas de pendientes.
+## Disponible al cerrar este corte
 
-## Reanudación — 25 de octubre de 2026
+- Registro/login de jugadores y solicitud/aprobación/rechazo de docentes; estadísticas por grupo y acceso administrativo de soporte. Cuenta local admin_local conservada junto con docente_local; contraseñas fuera del repositorio. Mi cuenta muestra datos privados del titular; destinatarios administrativos de avisos son independientes.
+- Docentes crean sus grupos, agregan jugadores por alias/correo exacto, comparten invitaciones de siete días, las reemplazan/revocan y retiran integrantes sin borrar cuentas ni partidas. No hay búsqueda global de jugadores ni asignación de docentes por otros docentes.
+- Correo automático de solicitudes y resoluciones; SMS administrativo al recibir solicitud nueva. Usuario confirmó recepción real de ambos, con correo inicialmente en spam y SMS demorado. No se determinó la causa de esas incidencias.
+- Sector 01 individual con seis sistemas, avatar persistente, mapa Canvas con maquinaria y señales animadas, movimiento suavizado, objetivos marcables, orientación inicial no bloqueante y ayudas visuales contextualizadas. Ayudas validadas por proximidad y registradas, sin resolver mecanismos ni consumir recursos. Gestos del dron se habilitan progresivamente. Hangar completado permite viajar directamente al Sector 02. Preferencia de movimiento reducido respetada.
+- Primera versión individual Sector 02: cuatro instalaciones, dos situaciones por instalación, torre final, ayudas y persistencia separada. Requiere Sector 01 completo. No están implementados equipos libres, cooperación ni chat.
+- Evidencia nueva en ambos niveles con resultados y estados de mecanismos; detalle docente del Sector 02 y consultas de ayuda. No se reconstruyen eventos históricos ni se generan calificaciones de dominio.
+- Celular mexicano opcional en ambos registros y Mi cuenta, privado, con verificación SMS, reemplazo y retirada. Cambio autenticado de contraseña y recuperación por correo o celular personal verificado desde ambos accesos. Códigos temporales de un solo uso, límites de intentos/emisión, revocación de sesiones y conservación de partidas. Ver seguridad-cuenta.md.
 
-- Nuevo reparto autorizado: docentes aprobados crean y gestionan sus grupos e invitaciones; administración conserva acceso global para soporte y asignación manual. Alumnos aceptan la invitación en la bienvenida y siguen jugando, sin tareas de administración. Migración `005_group_invites` aplicada tras respaldo `backups/before-group-invites.sql`. No modifica partidas existentes. Invitaciones de siete días, revocables/reemplazables, almacenadas como hash; retirar integrantes conserva sus cuentas y partidas. Ocho pruebas aprobadas contra instancia aislada con proveedores desactivados; cubren creación docente, aislamiento, canje repetido, revocación, caducidad, acceso administrativo y conservación de avance. Pendiente validar visualmente el nuevo flujo en laptop/teléfono.
+## Verificación de este corte
 
-- Panel docente muestra alias y correo de la cuenta conectada junto a «Cerrar sesión», también para solicitudes pendientes. La identidad se limpia al salir o expirar sesión. `admin_local` no tiene correo registrado: mostrarlo explícitamente, sin inferirlo del destinatario de notificaciones. Respuestas autenticadas de estado y grupos verificadas con la nueva información.
+- 15 pruebas automáticas aprobadas en instancia aislada con proveedores de correo/SMS desactivados; cubren autenticación, celulares, cambios/recuperación, códigos, revocación de sesiones, Sector 01, ayudas, recorrido completo Sector 02, carreras de versiones, preservación de partidas, permisos y grupos.
+- Chrome automatizado: Sector 01 completo por la interfaz, ayuda registrada, gestos del dron, transición al Sector 02 y vista móvil de 390 px sin desbordamiento horizontal; sin excepciones JavaScript. Revisadas capturas locales, excluidas de Git.
+- Comprobaciones anteriores de interfaz: entrada y un control de la ruta del Sector 02; Mi cuenta y recuperación en ambos accesos, tamaños laptop/móvil. Cuentas de prueba eliminadas.
+- No se completó automáticamente por interfaz cada mecanismo del Sector 02. Su recorrido completo sí se probó por API. No hay mediciones en teléfonos reales ni validación educativa de la dificultad.
+- Entrega real de nuevos códigos personales de verificación/recuperación pendiente; las pruebas reales anteriores de proveedores eran avisos docentes. No enviar mensajes solo para documentar.
 
-- Validación final del usuario: «ya recibí el SMS, todo el flujo funcionó bien con email y SMS». Entrega real de ambos canales confirmada; el SMS llegó con demora y no se reenvió. Los correos inicialmente llegaron a spam: sigue pendiente revisar autenticación/reputación del remitente sin atribuir una causa hasta inspeccionar cabeceras. La confirmación no detalla la consulta de las dos partidas ni la prueba visual de aislamiento entre grupos; mantener esas comprobaciones pendientes.
+## Pendientes, en orden para retomar
 
-- SMS LabsMobile integrado para avisar a administración de nuevas solicitudes, remitente `RedCero`. Teléfono y credenciales en `.env`, excluido de Git. Correo y SMS activos en instancia local. Panel administrativo consulta solicitudes cada 10 segundos estando visible.
-- Prueba real: cuenta `docente_aviso_mvnlppi5`, id 84, con correo administrativo proporcionado por el usuario, institución «Validación local de notificaciones». Registro HTTP 201; proveedor de correo aceptó los avisos y LabsMobile aceptó SMS real, referencia `6addc610d60a5`. Cuenta de prueba conservada para gestión visual; no es docente real. En la última consulta las dos solicitudes existentes estaban aprobadas. No se guardó su contraseña ni quedó sesión de prueba abierta. Recepción física confirmada por el usuario posteriormente. Ocho pruebas aprobadas en instancia aislada con envíos desactivados.
+1. Pulir el Sector 02: controles menos repetitivos, demostraciones y consecuencias más visibles en el mundo, recorrido y cierre narrativo. Verificar todas las instalaciones mediante interfaz, teclado, tacto emulado y movimiento reducido.
+2. Completar evidencia diagnóstica y observatorio: separar avance/ayudas/evidencia suficiente, variantes y decisiones individuales; no inferir trayectorias no registradas ni dominio del grupo por una solución compartida. Confirmar cobertura curricular antes de publicitar nivelación integral.
+3. Implementar equipos de juego libres, acceso privado y cooperación en ambos niveles junto con chat en tiempo real desde su primera entrega. Servidor autoritativo, permisos, deduplicación, inventario compartido, reconexión y atribución por participante. No reutilizar grupos docentes como autorización de salas.
+4. Para el chat: moderación servidor en español, spam y datos personales, silenciar/bloquear/reportar, revisión administrativa y retención definida; sin privados, enlaces ni archivos en el primer incremento. Probar evasiones y acceso ajeno a salas; conservar mensajes predeterminados como alternativa.
+5. Al completar los dos niveles y la entrega cooperativa acordada: pruebas reales del usuario en laptops y celulares del recorrido, guardado, reconexión, equipos/chat y flujo docente; incluir verificación y recuperación personales por email/SMS y aislamiento visual entre grupos.
+6. Antes del piloto: cuenta SQL dedicada y retirar root temporal; rotar credenciales compartidas durante la sesión; resolver spam del correo a partir de cabeceras; definir retención/purga de desafíos, soporte para cuentas sin canal recuperable y cola durable de notificaciones/recuperación. Alojamiento, DNS, HTTPS/WSS, seguridad, privacidad y moderación para adolescentes. No exponer XAMPP públicamente.
 
-- Integrados avisos por API de correo para nueva solicitud (docente y administración), aprobación y rechazo (docente), con estado de notificación en la interfaz. Destinatario administrativo confirmado por el usuario: `admin@appsevolution.com.mx`. Configuración local en `.env`; sin cambios de esquema. Sin cola/reintentos persistentes; recepción real ya confirmada por el usuario. Seis pruebas aprobadas en instancia aislada, con envíos externos desactivados y proveedor simulado en tests de correo.
+## Entorno y preservación
 
-- `npm test`: 4 pruebas aprobadas, 0 fallos, después de reparar MariaDB. Incluyen autenticación, reglas del sector y flujo docente por API con aislamiento y limpieza de cuentas temporales.
-- Las partidas de `jccp3033` y `ccardenas` conservan `complete:true`; `jccp33` es otra cuenta y tiene una partida inicial. No confundir los alias ni trasladar avances entre cuentas.
-- El grupo «Piloto de desarrollo» conserva tres jugadores y `docente_local` como administrador asignado. La validación visual del punto 1 sigue pendiente; las pruebas API no la sustituyen.
-- El usuario indicó que no dispone de la contraseña de `docente_local`. No se ha restablecido. Resolver el acceso administrativo antes de validar su inicio de sesión en la interfaz.
-- A petición del usuario se creó `admin_local` con rol administrador, conservando `docente_local`. Inicio de sesión y acceso a solicitudes y grupos verificados por API; sesión de comprobación cerrada. Contraseña entregada al usuario, no guardada en archivos. Usar `admin_local` para la validación visual pendiente desde la otra laptop en `http://192.168.1.150:3000/docentes/`.
-
-## Orden acordado
-
-### Prioridades y aclaraciones nuevas — 25 de octubre de 2026
-
-- Requisitos persistentes actualizados en `prompt-maestro.md`: honestidad explícita, publicación inicial real con dos niveles y separación entre equipos de juego libres y grupos de seguimiento docente. Los docentes deben poder incorporar jugadores por alias/correo compartido; la implementación actual sigue reservando esa asignación manual a administración, por lo que requiere ampliación con autorización por grupo. No considerar ese flujo completado.
-- Incorporados cuatro ejes de nivelación: proporcionalidad/porcentajes; operaciones razonadas de varios pasos; fracciones/decimales y sus conversiones; áreas/perímetros contextualizados. Aplicarlos como decisiones del juego, no ejercicios mecánicos ni cuestionarios. Ver propuestas en `plan-inicial.md`.
-- Próximo entregable de diseño: matriz de los niveles 1 y 2 con objetivos, mecanismos, variantes, ayudas y evidencia individual. No prometer que estos cuatro ejes agotan primaria ni que completar la misión acredita dominio. No hay fecha exacta de publicación acordada.
-- La recomendación de posponer chat libre fue una propuesta del asistente, no una autorización explícita del usuario para quitar ese requisito. Acordar su alcance de lanzamiento antes de tratarlo como diferido.
-
-1. Validar el flujo docente completo desde la interfaz:
-   - Solicitar una cuenta docente desde otro navegador o sesión privada.
-   - Iniciar sesión como administrador `admin_local` y aprobarla. El usuario confirmó el flujo de notificaciones; no repetir envíos solo para documentar.
-   - El docente aprobado puede crear su grupo o recibir asignación administrativa al grupo de prueba. Validar las nuevas invitaciones desde otro dispositivo.
-   - Confirmar que puede consultar las dos partidas completadas del Sector 01.
-   - Comprobar que no ve grupos ni estudiantes ajenos. Usar un grupo separado para verificar el aislamiento sin alterar las partidas existentes.
-   - Registrar resultados y corregir cualquier fallo. Las pruebas automáticas ya cubren permisos y aprobación; queda pendiente esta validación de la interfaz.
-2. Desarrollar la primera partida cooperativa del Sector 01:
-   - Invitación privada para compartir una misma partida entre laptop y celular.
-   - Dos avatares visibles y movimiento sincronizado en tiempo real con WebSockets.
-   - Mecanismos, inventario y avance compartidos, validados por el servidor.
-   - Resolver acciones simultáneas, reconexión, permisos de sala y persistencia sin duplicar recursos.
-   - Mantener las partidas individuales y sus avances existentes; preparar migraciones compatibles.
-   - Conservar la atribución de acciones a cada participante en las estadísticas, sin atribuir dominio individual por resolver un objetivo en equipo.
-   - Incorporar chat en tiempo real dentro de cada partida privada, con restricciones de contenido para adolescentes de 12 a 18 años. Es un requisito del multijugador, todavía no implementado.
-   - Validar mensajes en el servidor antes de difundirlos: limitar longitud y frecuencia, normalizar texto y filtrar insultos, acoso, amenazas, contenido sexual inapropiado y solicitudes o difusión de datos personales. Considerar variantes de escritura en español de México; un filtro de palabras por sí solo no garantiza la moderación.
-   - Permitir mensajes solo entre integrantes autorizados de la sala, mostrando alias, sin correos ni datos reales. Dejar fuera del primer incremento los mensajes privados, archivos y enlaces externos.
-   - Añadir silenciar, bloquear y reportar, con revisión por administración/moderación y consecuencias proporcionales. Definir permisos de revisión y una retención mínima para reportes antes de habilitar el chat con participantes reales.
-   - Probar evasiones del filtro, spam, acceso ajeno a salas y funcionamiento en móvil; los rechazos deben usar mensajes claros y permitir continuar jugando. Mantener marcas y mensajes predeterminados para quienes no quieran usar texto libre.
-3. Antes de publicar el piloto:
-   - Respaldo y restauración de `mysql.db` realizados el 25 de octubre; ver detalle arriba. Revisar permisos personalizados requeridos por otros proyectos, ya que no fueron recuperables de la tabla dañada.
-   - Habilitar y verificar la cuenta SQL dedicada `redcero_app`; retirar la conexión temporal mediante root y desactivar `DB_ALLOW_LOCAL_ROOT`.
-   - Preparar alojamiento, DNS y HTTPS para `redcero.com.mx`; todavía no hay despliegue público verificado.
-
-## Última comprobación al preparar el commit
-
-- API saludable, siete cuentas, tres partidas individuales y dos completadas. Dos solicitudes docentes aprobadas. Cinco migraciones aplicadas. Los datos locales pueden cambiar.
-- Documentación preparada sin crear commit ni modificar el índice de Git. Secretos y respaldos permanecen excluidos.
-
-## Estado disponible
-
-- Login y registro de jugadores con alias, correo privado y contraseña; bcrypt y sesiones persistentes.
-- Avatar y Sector 01 individual: suministros por coordenadas, pasarela, refrigeración, patrones de pulsos, dron por gestos y hangar.
-- Observatorio docente: registro por solicitud, consulta del estado, aprobación/rechazo administrativo, asignación de grupos y estadísticas por estudiante.
-- Las pruebas automáticas pasaron al terminar la implementación del registro docente. No se hizo validación visual automatizada ni medición de rendimiento en teléfonos reales. El usuario sí completó el sector desde laptop y celular con dos jugadores.
-- Grupo «Piloto de desarrollo»: en la última comprobación había tres cuentas de jugador, dos con el sector completado. Volver a consultar el estado real al retomar; estos datos pueden cambiar.
-- Migraciones aplicadas: `001_initial`, `002_player_email`, `003_sector_one`, `004_teacher_requests`, `005_group_invites`.
-
-## Entorno para retomar
-
-- Carpeta: `C:\xampp\htdocs\kinetika`.
-- Laptop con IP estática `192.168.1.150`; Node escucha en `0.0.0.0:3000` en desarrollo.
-- Juego: `http://192.168.1.150:3000/`. Observatorio: `http://192.168.1.150:3000/docentes/`.
-- También disponibles desde Apache bajo `http://localhost/kinetika/` y `http://localhost/kinetika/docentes/`.
-- Iniciar Apache/MariaDB en XAMPP y Node con `npm start` si están detenidos. Base `redcero_dev`; conexión SQL por `127.0.0.1`.
-- La regla `RedCero-Dev-LAN-3000` permite Node en TCP 3000 desde la subred local. El Wi-Fi estaba clasificado como público; no se cambió su categoría.
-- Credenciales en `.env` y en el gestor del usuario/conversación previa; no copiar contraseñas, tokens ni respaldos sensibles a archivos versionados. La cuenta administrativa existente es `docente_local`; no cambiar su contraseña al retomar sin necesidad.
-- `npm test` verifica autenticación, recorrido completo del sector, aislamiento docente y registro/aprobación/rechazo de solicitudes. Las pruebas eliminan sus propias cuentas temporales.
-
-## Restricciones que se conservan
-
-Leer `prompt-maestro.md`, `estilo.md` y `plan-inicial.md` antes de implementar. Asumir cero conocimientos de programación: el jugador interactúa con objetos, iconos y gestos, sin consolas, scripts, editores de bloques ni pantallas de enseñanza en el Nivel 1. Mantener controles móviles, identidad nacional Red Cero y assets existentes. No romper registro, sesiones, partidas o estadísticas que ya funcionan. Revisar el árbol de trabajo antes de editar y conservar cambios existentes; no hacer commits o despliegues por el solo hecho de retomar estas notas.
+- Carpeta C:/xampp/htdocs/kinetika. IP local 192.168.1.150; Node 0.0.0.0:3000. Juego http://192.168.1.150:3000/ y observatorio /docentes/. Apache también sirve /kinetika/ y /kinetika/docentes/.
+- Iniciar Apache/MariaDB con XAMPP y Node con npm start si están detenidos. Revisar procesos antes de levantar otro Node. Ver README para pruebas aisladas sin envíos reales.
+- MariaDB redcero_dev por 127.0.0.1. Migraciones aplicadas 001_initial a 007_account_security. No volver a importar esquemas sobre datos ni borrar partidas para probar.
+- XAMPP reparado: mysql.db tenía datos/índice corruptos; se restauraron solo db.MAD/db.MAI desde la copia original después de respaldo físico verificado. global_priv y bases se conservaron. Permisos personalizados de mysql.db no recuperables. No sigue pendiente reparar el arranque; sí restablecer permisos requeridos y habilitar redcero_app.
+- Respaldo previo al Sector 02: backups/before-sector-two.sql. Previo a seguridad de cuentas: backups/before-account-security.sql. Respaldo físico de XAMPP: backups/xampp-mysql-20261025-012841/. Excluidos de Git, con datos sensibles.
+- Última comprobación: siete cuentas, tres partidas Sector 01 y dos completadas. jccp3033 y ccardenas conservan su final; jccp33 es otra cuenta, no transferir avances entre alias parecidos. Ningún número ni contraseña de cuentas existentes fue cambiado en las pruebas.

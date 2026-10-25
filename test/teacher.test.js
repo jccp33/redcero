@@ -30,6 +30,9 @@ test('panel docente restringe grupo, correo, detalle y administración',async()=
     assert.equal((await req(`/students/${ids[3]}?groupId=${groups[0]}`,'other')).status,404);
     const detail=await (await req(`/students/${ids[3]}?groupId=${groups[0]}`,'teacher')).json();assert.equal(detail.student.complete,true);assert.equal(detail.systems.find(s=>s.key==='coolant').accepted,2);assert.equal(detail.systems.find(s=>s.key==='coolant').retry,1);assert.equal(detail.totalEvents,3);
     assert.ok(!Object.hasOwn(detail.student,'password_hash'));
+    assert.equal((await req(`/students/${ids[3]}/evidence?groupId=${groups[0]}`,'teacher')).status,200);
+    assert.equal((await req(`/students/${ids[4]}/evidence?groupId=${groups[1]}`,'teacher')).status,404);
+    assert.equal((await req(`/students/${ids[4]}/evidence?groupId=${groups[0]}`,'teacher')).status,404);
     const createdResponse=await req('/groups','teacher',{name:prefix+' propio'});assert.equal(createdResponse.status,201);const created=await createdResponse.json();groups.push(created.id);
     assert.equal((await req('/groups/'+created.id+'/invitation','other',{})).status,404);
     const invite=await (await req('/groups/'+created.id+'/invitation','teacher',{})).json();assert.match(invite.code,/^[A-Za-z0-9_-]{24}$/);
@@ -45,7 +48,12 @@ test('panel docente restringe grupo, correo, detalle y administración',async()=
     const [stillThere]=await db.execute('SELECT state_json FROM player_sectors WHERE user_id=?',[ids[3]]);assert.equal(JSON.parse(stillThere[0].state_json).complete,true);
     const [originalMember]=await db.execute('SELECT user_id FROM group_members WHERE group_id=? AND user_id=?',[groups[0],ids[3]]);assert.equal(originalMember.length,1);
     assert.equal((await req('/students?groupId='+created.id,'admin')).status,200);
-    assert.equal((await req(`/groups/${groups[0]}/members`,'teacher',{identifier:`${prefix}_outsider`,role:'player'})).status,403);
+    assert.equal((await req(`/groups/${groups[1]}/members`,'teacher',{identifier:`${prefix}_student`,role:'player'})).status,404);
+    assert.equal((await req(`/groups/${groups[0]}/members`,'teacher',{identifier:`${prefix}_other`,role:'teacher'})).status,403);
+    assert.equal((await req(`/groups/${groups[0]}/members`,'teacher',{identifier:'no_existe_'+prefix,role:'player'})).status,404);
+    assert.equal((await req(`/groups/${groups[0]}/members`,'teacher',{identifier:`${prefix}_outsider`,role:'player'})).status,200);
+    assert.equal((await req(`/groups/${groups[0]}/members`,'teacher',{identifier:`${prefix}_outsider@example.com`,role:'player'})).status,200);
+    const [memberships]=await db.execute('SELECT group_id FROM group_members WHERE user_id=?',[ids[4]]);assert.equal(memberships.length,2);
     assert.equal((await req(`/groups/${groups[0]}/members`,'admin',{identifier:`${prefix}_outsider`,role:'teacher'})).status,400);
     assert.equal((await req(`/groups/${groups[0]}/members`,'admin',{identifier:`${prefix}_outsider`,role:'player'})).status,200);
     const after=await (await req(`/students?groupId=${groups[0]}`,'teacher')).json();assert.equal(after.total,2);

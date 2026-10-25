@@ -18,7 +18,8 @@ test('registro, acceso, persistencia y revocación de sesión',async () => {
     assert.equal((await send('register',{username,email,password},undefined,'https://unknown.invalid')).status,403);
     assert.equal((await send('register',{username,password})).status,400);
     assert.equal((await send('register',{username,email:'invalid',password})).status,400);
-    const registration = await send('register',{username,email:'  ' + email.toUpperCase() + '  ',password,global_role:'admin'});
+    assert.equal((await send('register',{username,email,password,phone:'invalid'})).status,400);
+    const registration = await send('register',{username,email:'  ' + email.toUpperCase() + '  ',password,phone:'+52 641 123 4567',global_role:'admin'});
     assert.equal(registration.status,201);
     const cookie = registration.headers.get('set-cookie').split(';')[0];
     assert.match(registration.headers.get('set-cookie'),/HttpOnly/i);
@@ -30,7 +31,8 @@ test('registro, acceso, persistencia y revocación de sesión',async () => {
     assert.equal((await send('me')).status,401);
     assert.equal((await (await send('me',undefined,cookie)).json()).user.username,username);
     const me = await (await send('me',undefined,cookie)).json();
-    assert.equal(Object.hasOwn(me.user,'email'),false);
+    assert.equal(Object.hasOwn(me.user,'email'),false);assert.equal(Object.hasOwn(me.user,'phone_e164'),false);
+    const [phones]=await db.execute('SELECT phone_e164,phone_verified_at FROM users WHERE username=?',[username]);assert.equal(phones[0].phone_e164,'526411234567');assert.equal(phones[0].phone_verified_at,null);
     assert.equal((await send('register',{username:username + 'x',email,password})).status,409);
     const login = await send('login',{username,password},cookie);
     assert.equal(login.status,200);
@@ -60,7 +62,7 @@ test('registro, acceso, persistencia y revocación de sesión',async () => {
       while(game.state.x!==x)await play({type:'move',dx:Math.sign(x-game.state.x),dy:0});
       while(game.state.y!==y)await play({type:'move',dx:0,dy:Math.sign(y-game.state.y)});
     };
-    await walk(-3,2);await play({type:'supply'});assert.equal(game.state.metal,6);
+    await walk(-3,2);const beforeHelp=structuredClone(game.state);await play({type:'hint',site:'supply'});assert.deepEqual(game.state,beforeHelp);const [helps]=await db.execute("SELECT COUNT(*) AS total FROM learning_evidence WHERE user_id=? AND action='hint' AND mechanism_key='supply'",[me.user.id]);assert.equal(helps[0].total,1);await play({type:'supply'});assert.equal(game.state.metal,6);
     await walk(-1,1);for(let i=0;i<3;i++)await play({type:'build'});
     await walk(2,2);for(const [index,count]of [[0,6],[1,3],[2,3]])for(let i=0;i<count;i++)await play({type:'flow',index,delta:1});
     await walk(3,-2);for(let i=0;i<6;i++)await play({type:'pulse',delta:1});await play({type:'transmit'});

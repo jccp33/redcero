@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="public/assets/isotipo.svg">
   <link rel="stylesheet" href="public/style.css"><script type="module" src="public/app.js"></script>
   <link rel="stylesheet" href="public/sector.css">
-</head>
+<link rel="stylesheet" href="public/sector-two.css"><link rel="stylesheet" href="public/account.css"></head>
 <body>
   <header><a class="brand" href="./" aria-label="Red Cero, inicio"><picture><source media="(max-width: 620px)" srcset="public/assets/isotipo.svg"><img class="brand-logo" src="public/assets/logotipo.svg" alt="Red Cero" width="600" height="150"></picture><span class="edition">ALPHA / 0.1</span></a><span class="header-note"><span class="dot"></span> RED CERO · MÉXICO</span></header>
   <main>
@@ -34,7 +34,7 @@
           <form id="auth-form">
             <label for="username">ALIAS DE JUGADOR</label><input id="username" name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]{3,24}" placeholder="Tu nombre en la estación" aria-describedby="alias-hint"><small id="alias-hint">3–24 letras, números o guion bajo.</small>
             <div id="email-field" hidden><label for="email">CORREO ELECTRÓNICO</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="tu@correo.com" aria-describedby="email-hint" disabled><small id="email-hint">Tu correo es privado. Permite a tu docente encontrarte y relacionar tu progreso.</small></div>
-            <label for="password">CONTRASEÑA</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72" placeholder="Tu clave de acceso"><button type="button" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false">Ver</button></div>
+            <div id="phone-field" hidden><label for="phone">CELULAR DE MÉXICO · OPCIONAL</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="10 dígitos o +52"><small>Privado. Verifícalo después en Mi cuenta para recuperar tu acceso por SMS.</small></div><label for="password">CONTRASEÑA</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="72" placeholder="Tu clave de acceso"><button type="button" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false">Ver</button></div>
             <small id="password-hint" hidden>Elige una clave de al menos 10 caracteres y guárdala para volver.</small>
             <div id="confirm-field" hidden><label for="confirm">REPITE TU CONTRASEÑA</label><input id="confirm" name="confirm" type="password" autocomplete="new-password" maxlength="72" placeholder="Confirma tu clave"></div>
             <p id="message" role="status" aria-live="polite"></p>
@@ -47,7 +47,7 @@
           <span class="connected-tag"><span class="dot"></span> ENLACE ESTABLECIDO</span>
           <h2>Estás dentro,<br><span id="player-name"></span>.</h2>
           <p class="subtitle">Tu credencial de tripulación está lista.</p>
-          <div class="mission"><span class="eyebrow">SECTOR 01 · LA ESTACIÓN DESPIERTA</span><h3>Tu señal hace falta.</h3><p>Elige tu traje, recupera suministros y devuelve la energía a la estación. Tu avance se guarda al jugar.</p><button type="button" class="primary" id="enter-sector">Preparar mi avatar <span aria-hidden="true">↗</span></button></div>
+          <div class="mission"><span class="eyebrow">SECTOR 01 · LA ESTACIÓN DESPIERTA</span><h3>Tu señal hace falta.</h3><p>Elige tu traje, recupera suministros y devuelve la energía a la estación. Tu avance se guarda al jugar.</p><button type="button" class="primary" id="enter-sector">Preparar mi avatar <span aria-hidden="true">↗</span></button><button type="button" class="secondary" id="enter-sector-two">Sector 02 · Reconstruir el enlace ↗</button><p>El puesto exterior se abre al restaurar el Sector 01.</p></div>
           <p><a href="docentes/" id="teacher-link" hidden>Ir al observatorio docente ↗</a></p>
           <p id="session-message" role="status"></p><button type="button" class="secondary" id="logout">Cerrar sesión <span aria-hidden="true">↗</span></button>
         </div>

@@ -8,6 +8,20 @@ Disponible localmente: registro con alias, correo privado y contraseña, sesione
 
 ## Jugar el Sector 01
 
+La estación muestra maquinaria y conducciones que se iluminan al restaurar sistemas. Los objetivos se pueden marcar en el mapa sin bloquear el orden de exploración. La orientación inicial se retira al caminar; «Ver señal de ayuda» proyecta una demostración y registra la consulta sin resolver el mecanismo. Los gestos del dron se habilitan según su estado. El hangar completado ofrece viaje directo al Sector 02. Movimiento visual suavizado sobre posiciones aceptadas por servidor y animaciones con preferencia de movimiento reducido.
+
+Resumen del corte y pendientes: [corte de niveles y cuenta](docs/corte-niveles-cuenta.md).
+
+### Sector 02 — Reconstrucción del enlace
+
+Primera versión individual disponible con la migración compatible `006_sector_two`. El botón de bienvenida «Sector 02 · Reconstruir el enlace» se habilita en el servidor solo después de completar el Sector 01; las partidas anteriores completadas pueden acceder sin repetirlo. Ambos sectores conservan estados separados y usan el mismo avatar.
+
+El puesto exterior se recorre tocando el mapa o usando flechas/WASD y E. Cuatro instalaciones necesitan dos conexiones cada una: ruta con escala y carga porcentual, taller con pedido y presupuesto/sobrante, depósitos con fracciones y medida decimal, y refugio con huella, perímetro y piso. Los controles actúan sobre materiales e instrumentos; «Consultar la baliza» ofrece ayuda registrada. Tras las ocho conexiones se activa la torre. El estado se guarda después de cada acción validada; volver a entrar no reinicia los mecanismos.
+
+`player_sector_two` almacena el segundo nivel con versión; `learning_evidence` registra decisiones y estados mínimos de mecanismos, resultados y ayudas sin movimientos ni correo. Las acciones nuevas del Sector 01 también generan evidencia, conservando `sector_events` y sus estadísticas previas. No se inventa evidencia para partidas antiguas. El detalle docente muestra avance del Sector 02 y resúmenes de activaciones/ayudas con autorización por grupo; estos datos no son calificaciones ni prueba de dominio.
+
+La versión actual sigue siendo individual: equipos libres, cooperación y chat no están disponibles. El chat en tiempo real es requisito de la primera entrega que permita jugar en equipos. Las pruebas reales del usuario se harán al completar y pulir ambos niveles. Ver [matriz de niveles](docs/matriz-niveles.md).
+
 ### Probar desde móviles en la misma red
 
 La laptop usa `192.168.1.150`. En desarrollo, `.env` configura `HOST=0.0.0.0` y permite los orígenes de esa IP; iniciar Node con `npm start`. Desde un dispositivo conectado a la misma red Wi-Fi, abrir **http://192.168.1.150:3000/**. También se puede usar **http://192.168.1.150/kinetika/** si Apache permite conexiones LAN. La página de Apache dirige su API al puerto 3000 de esa misma IP.
@@ -87,17 +101,21 @@ El esquema incluye las migraciones `001_initial` a `005_group_invites`; consulta
 
 ## Verificación
 
+### Cambio, recuperación de contraseña y celular personal
+
+Implementado con la migración aditiva `007_account_security`: teléfono mexicano opcional en ambos registros y «Mi cuenta», verificación por SMS con contraseña actual, cambio/retirada del celular, cambio autenticado de contraseña y recuperación mediante código desde ambos logins. Los destinos son el correo o celular verificado del titular; los destinos administrativos permanecen independientes. El registro no dispara SMS y un teléfono sin verificar no sirve para recuperación. Ver [seguridad de cuenta](docs/seguridad-cuenta.md) para uso, rutas, controles, pruebas y pendientes.
+
 El resumen del incremento preparado para commit está en [registro de la sesión](docs/registro-2026-10-25.md). El alcance aprobado de dos niveles y la separación entre equipos de juego y grupos docentes están en [requisitos](docs/prompt-maestro.md); no todo ese alcance está implementado.
 
 ### Gestión de grupos por docentes
 
-La migración compatible `005_group_invites` agrega invitaciones sin modificar partidas ni asignaciones previas. Docentes aprobados crean grupos y quedan vinculados a ellos en una transacción. Pueden generar un enlace de invitación válido por siete días, reemplazarlo o revocarlo, y quitar estudiantes de sus grupos sin borrar cuentas, eventos ni partidas. El código aleatorio se guarda solo como hash. Revocar no expulsa a integrantes actuales. Al abrir el enlace del docente, el jugador conecta su cuenta y acepta la invitación desde la bienvenida; su progreso individual se conserva. No hay búsqueda global de cuentas para docentes.
+La migración compatible `005_group_invites` agrega invitaciones sin modificar partidas ni asignaciones previas. Docentes aprobados crean grupos y quedan vinculados a ellos en una transacción. Pueden generar un enlace de invitación válido por siete días, reemplazarlo o revocarlo, y quitar estudiantes de sus grupos sin borrar cuentas, eventos ni partidas. El código aleatorio se guarda solo como hash. Revocar no expulsa a integrantes actuales. Al abrir el enlace del docente, el jugador conecta su cuenta y acepta la invitación desde la bienvenida; su progreso individual se conserva. Los docentes también pueden agregar estudiantes por alias o correo exacto compartido por el jugador, solo a sus grupos. No hay búsqueda global ni autocompletado de cuentas. La asignación de docentes permanece reservada a administración; agregar un jugador conserva sus otras pertenencias y partidas.
 
 Administración conserva consulta de todos los grupos y estadísticas y la asignación manual por alias/correo para soporte, incluida la asignación de docentes a grupos existentes. Los docentes solo consultan y gestionan grupos donde están asignados. El canje comprueba sesión, rol, caducidad, revocación y que el emisor siga habilitado y vinculado al grupo. Las invitaciones se pueden compartir con varios alumnos; tratarlas como enlaces privados y revocarlas al terminar la incorporación. Las correcciones directas de datos siguen siendo mantenimiento administrativo, sin editor SQL en la interfaz.
 
 ### Correos de solicitudes docentes
 
-Los avisos administrativos de nuevas solicitudes también admiten SMS de LabsMobile. Configurar `SMS_NOTIFICATIONS_ENABLED`, `LABSMOBILE_USERNAME`, `LABSMOBILE_API_TOKEN`, `LABSMOBILE_SENDER_ID` (predeterminado `RedCero`), `LABSMOBILE_TEST_MODE`, `SMS_DEFAULT_COUNTRY_CODE` (52) y `SMS_ADMIN_PHONES` (lista separada por comas). Guardar credenciales y teléfonos únicamente en `.env`. En modo simulado se envía `test:1`; en real, `test:0`. Solo HTTP exitoso y código `0` se consideran aceptados, sin garantizar entrega al dispositivo. No se recogen teléfonos de estudiantes ni docentes. El SMS no incluye sus datos personales. Sin reintentos automáticos para evitar cargos duplicados ante respuestas ambiguas.
+Los avisos administrativos de nuevas solicitudes también admiten SMS de LabsMobile. Configurar `SMS_NOTIFICATIONS_ENABLED`, `LABSMOBILE_USERNAME`, `LABSMOBILE_API_TOKEN`, `LABSMOBILE_SENDER_ID` (predeterminado `RedCero`), `LABSMOBILE_TEST_MODE`, `SMS_DEFAULT_COUNTRY_CODE` (52) y `SMS_ADMIN_PHONES` (lista separada por comas). Guardar credenciales y teléfonos únicamente en `.env`. En modo simulado se envía `test:1`; en real, `test:0`. Solo HTTP exitoso y código `0` se consideran aceptados, sin garantizar entrega al dispositivo. Estos avisos administrativos no consultan teléfonos personales; los usuarios pueden asociar un celular privado por separado en Mi cuenta. El SMS no incluye sus datos personales. Sin reintentos automáticos para evitar cargos duplicados ante respuestas ambiguas.
 
 Las solicitudes del administrador se consultan automáticamente cada 10 segundos mientras el panel está visible. Las decisiones siguen siendo manuales. Para pruebas automáticas iniciar una instancia aislada con **ambos** `MAIL_ENABLED=false` y `SMS_NOTIFICATIONS_ENABLED=false`.
 
@@ -115,7 +133,7 @@ npm test
 
 La prueba de integración crea un jugador temporal, comprueba registro, duplicado, contraseña incorrecta, sesión, permisos de origen y cierre de sesión. Elimina su propio jugador al terminar. Ejecutarla únicamente contra la base local de desarrollo; usa `TEST_BASE_URL` si el servidor no está en el puerto 3000.
 
-Comprobación manual: crear cuenta, elegir avatar, recorrer el sector y recargar para comprobar persistencia; cerrar sesión e ingresar de nuevo. Probar en un teléfono real la pulsación sostenida de flechas, navegación tocando el mapa, válvulas y desplazamiento vertical hasta los mecanismos. Las pruebas automáticas cubren el recorrido completo por API, restricciones de distancia, recursos, versión y conservación del avance al editar avatar. El panel tiene pruebas de acceso anónimo/jugador/docente/administrador, aislamiento de grupos y correos, conteos y revocación de roles. No se ha realizado validación visual automatizada en navegador ni medición en teléfonos reales. Este incremento no incluye recuperación de contraseña.
+Comprobación manual: crear cuenta, elegir avatar, recorrer el sector y recargar para comprobar persistencia; cerrar sesión e ingresar de nuevo. Probar en un teléfono real la pulsación sostenida de flechas, navegación tocando el mapa, válvulas y desplazamiento vertical hasta los mecanismos. Las pruebas automáticas cubren el recorrido completo por API, restricciones de distancia, recursos, versión y conservación del avance al editar avatar. El panel tiene pruebas de acceso anónimo/jugador/docente/administrador, aislamiento de grupos y correos, conteos y revocación de roles. Hay comprobaciones automatizadas de navegador del Sector 01 completo y de partes del Sector 02 y de Mi cuenta, con tamaños laptop/móvil; no sustituyen pruebas con teléfonos reales ni mediciones de rendimiento. La recuperación de contraseña ya está implementada; su entrega real de códigos personales sigue pendiente de validación con el usuario.
 
 ## Estructura
 

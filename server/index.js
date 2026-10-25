@@ -1,3 +1,5 @@
+import {accountSecurityRouter,personalPhone} from './account-security.js';
+import {sectorTwoRouter} from './sector-two.js';
 import {addGroupJoin} from './group-access.js';
 import express from 'express';
 import mysql from 'mysql2/promise';
@@ -43,6 +45,8 @@ async function session(req,res,user) {
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
+    const [currentUser]=await conn.execute('SELECT password_hash FROM users WHERE id=? FOR UPDATE',[user.id]);
+    if(!currentUser.length||(user.password_hash&&currentUser[0].password_hash!==user.password_hash)){const changed=new Error('Credenciales actualizadas');changed.code='AUTH_CHANGED';throw changed;}
     if (req.cookies.rc_session) await conn.execute('DELETE FROM auth_sessions WHERE token_hash = ?', [hash(req.cookies.rc_session)]);
     await conn.execute('INSERT INTO auth_sessions (token_hash,user_id,expires_at) VALUES (?,?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 12 HOUR))',[hash(token),user.id]);
     await conn.commit();
@@ -60,14 +64,15 @@ const registerAccount = (isTeacher=false) => async (req,res) => {
   const displayName=typeof req.body.displayName==='string'?req.body.displayName.trim():'';
   const institution=typeof req.body.institution==='string'?req.body.institution.trim():'';
   if(isTeacher&&(!displayName||displayName.length>100||!institution||institution.length>150))return res.status(400).json({error:'Indica tu nombre (hasta 100 caracteres) y escuela o institución (hasta 150).'});
+  let phone=null;if(req.body.phone!==undefined&&req.body.phone!==''){try{phone=personalPhone(req.body.phone);}catch(e){return res.status(400).json({error:e.message});}}
   const passwordHash = await bcrypt.hash(password,12);
   const connection=await db.getConnection();
   try {
     await connection.beginTransaction();
-    const [result] = await connection.execute("INSERT INTO users (username,email,password_hash,global_role) VALUES (?,?,?,'player')",[username,normalizedEmail,passwordHash]);
+    const [result] = await connection.execute("INSERT INTO users (username,email,password_hash,phone_e164,global_role) VALUES (?,?,?,?,'player')",[username,normalizedEmail,passwordHash,phone]);
     if(isTeacher)await connection.execute('INSERT INTO teacher_requests (user_id,display_name,institution) VALUES (?,?,?)',[result.insertId,displayName,institution]);
     await connection.commit();
-    const account=await session(req,res,{id:result.insertId,username});
+    const account=await session(req,res,{id:result.insertId,username,password_hash:passwordHash});
     if(isTeacher)account.notification=await notifyTeacher('pending',{username,email:normalizedEmail,displayName,institution});
     res.status(201).json(account);
   } catch(error) {await connection.rollback();if(error.code === 'ER_DUP_ENTRY') return res.status(409).json({error:'El alias o correo ya están registrados. Inicia sesión o revisa tus datos.'}); throw error;}finally{connection.release();}
@@ -93,12 +98,15 @@ app.post('/api/auth/logout',async (req,res) => {
   if(req.cookies.rc_session) await db.execute('DELETE FROM auth_sessions WHERE token_hash=?',[hash(req.cookies.rc_session)]);
   res.clearCookie('rc_session',cookie).json({ok:true});
 });
-app.use('/api/sector',sectorRouter(db,async (req,res,next) => {
+const authenticatePlayer=async (req,res,next) => {
   if(!req.cookies.rc_session) return res.status(401).json({error:'Tu enlace expiró. Vuelve a iniciar sesión.'});
   const [rows]=await db.execute('SELECT user_id FROM auth_sessions WHERE token_hash=? AND expires_at>UTC_TIMESTAMP()',[hash(req.cookies.rc_session)]);
   if(!rows.length) return res.status(401).json({error:'Tu enlace expiró. Vuelve a iniciar sesión.'});
   req.playerId=rows[0].user_id;next();
-}));
+};
+app.use('/api/account',accountSecurityRouter(db,{cookie}));
+app.use('/api/sector',sectorRouter(db,authenticatePlayer));
+app.use('/api/sector-two',sectorTwoRouter(db,authenticatePlayer));
 addGroupJoin(app,db,hash);
 app.use('/api/teacher',teacherRouter(db,hash,notifyTeacher));
 app.use('/api', (req,res) => res.status(404).json({error:'Ruta desconocida.'}));
@@ -106,6 +114,7 @@ app.get('/docentes/',(req,res) => res.sendFile(fileURLToPath(new URL('../docente
 app.get('/',(req,res) => res.sendFile(fileURLToPath(new URL('../index.html',import.meta.url))));
 app.use('/public',express.static(fileURLToPath(new URL('../public',import.meta.url))));
 app.use((err,req,res,next) => {
+  if(err.code==='AUTH_CHANGED')return res.status(401).json({error:'Tu contraseña cambió. Vuelve a iniciar sesión.'});
   if(err.type === 'entity.parse.failed' || err.type === 'entity.too.large') return res.status(400).json({error:'Solicitud inválida.'});
   console.error('Error de solicitud:',err.code || err.name);
   res.status(503).json({error:'No se pudo completar la conexión. Intenta de nuevo.'});

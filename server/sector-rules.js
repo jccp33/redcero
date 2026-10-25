@@ -13,6 +13,8 @@ export function act(previous, command) {
     if(x < -6 || x > 6 || y < -4 || y > 4) return fail('La estación termina aquí.');
     if(x===-1 && y===0 && s.bridge<3) return fail('Faltan piezas para cruzar la pasarela. Acércate y repara.');
     s.x=x;s.y=y;
+  } else if(command.type === 'hint' && Object.hasOwn(sites,command.site) && near(command.site)) {
+    message={supply:'La caja de la baliza conserva la batería. Acércate y recoge los suministros.',bridge:'Cada pieza ocupa un tramo. Si desmontas uno, recuperas su material.',coolant:'La reserva completa alimenta los tres circuitos: compara la mitad con cada cuarto.',relay:'La antena proyecta grupos de 2, 4 y 6 destellos. Observa cuánto crece cada grupo.',drone:'Señala el destino, recoge la celda al llegar y después indica volver.',hangar:'Comprueba las luces de batería, pasarela, depósitos, antena y dron.'}[command.site];
   } else if(command.type === 'supply' && near('supply')) {
     if(s.battery) return fail('Ya recuperaste estos suministros.');
     s.battery=true;s.metal=6;message='¡Batería recuperada! Encontraste también 6 piezas para la pasarela.';

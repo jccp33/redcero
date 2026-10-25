@@ -1,3 +1,5 @@
+import {createAccountControls} from './account.js';
+import {createSectorTwo} from './sector-two.js';
 import {createSector} from './sector.js';
 const $ = id => document.getElementById(id);
 // XAMPP serves the same client; Node serves the API on port 3000 locally.
@@ -7,7 +9,12 @@ let invitation=new URLSearchParams(location.hash.slice(1)).get('invitacion');
 let mode = 'login';
 let busy = false;
 const sector = createSector(request);
-$('enter-sector').addEventListener('click',() => sector.open());
+const sectorTwo=createSectorTwo(request);
+const accountControls=createAccountControls(request);
+$('enter-sector').addEventListener('click',() => {sectorTwo.close();sector.open();});
+async function enterSecondSector(){sector.close();try{await sectorTwo.open();}catch(e){$('session-message').textContent=e.message;}}
+$('enter-sector-two').addEventListener('click',enterSecondSector);
+document.addEventListener('redcero:next-sector',enterSecondSector);
 async function request(path, body) {
   const response = await fetch(`${api}/api${path}`, {credentials:'include', ...(body === undefined ? {} : {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
   const result = await response.json();
@@ -15,7 +22,8 @@ async function request(path, body) {
   return result;
 }
 function connected(user) {
-  sector.close();
+  accountControls.refresh();
+  sector.close();sectorTwo.close();
   $('auth-view').hidden = true; $('connected-view').hidden = false;
   $('player-name').textContent = user.username;$('crew-invitation').hidden=!invitation||user.role!=='player';$('crew-message').textContent='';
   $('teacher-link').hidden = !['teacher','admin'].includes(user.role);
@@ -32,6 +40,7 @@ function switchMode(next) {
   $('submit-label').textContent = register ? 'Crear mi credencial' : 'Conectar a la estación';
   $('confirm-field').hidden = !register; $('confirm').required = register;
   $('email-field').hidden = !register; $('email').required = register; $('email').disabled = !register;
+  $('phone-field').hidden=!register;$('phone').disabled=!register;
   $('password-hint').hidden = !register;
   $('password').autocomplete = register ? 'new-password' : 'current-password';
   $('password').minLength = register ? 10 : 1;
@@ -50,13 +59,13 @@ $('auth-form').addEventListener('submit',async event => {
   if(new TextEncoder().encode(password).length > 72) { $('message').textContent = 'Tu contraseña es demasiado larga. Prueba una más corta o usa menos símbolos.'; return; }
   if(mode === 'register' && password !== $('confirm').value) {$('message').textContent = 'Las contraseñas no coinciden.'; $('confirm').focus(); return;}
   busy = true; $('submit-button').disabled = true; $('message').textContent = 'Estableciendo enlace…';
-  try {const result = await request(`/auth/${mode}`,{username:$('username').value,password,...(mode === 'register' ? {email:$('email').value.trim()} : {})}); connected(result.user);}
+  try {const result = await request(`/auth/${mode}`,{username:$('username').value,password,...(mode === 'register' ? {email:$('email').value.trim(),phone:$('phone').value.trim()} : {})}); connected(result.user);}
   catch(error) {$('message').textContent = error instanceof TypeError ? 'No hay conexión con la estación. Comprueba que el servidor esté encendido.' : error.message;}
   finally {busy = false; $('submit-button').disabled = false;}
 });
 $('logout').addEventListener('click',async () => {
   $('logout').disabled = true;
-  try {await request('/auth/logout',{}); sector.close(); $('connected-view').hidden = true; $('auth-view').hidden = false; $('session-message').textContent = ''; switchMode('login'); $('username').focus();}
+  try {await request('/auth/logout',{});accountControls.refresh(); sector.close();sectorTwo.close(); $('connected-view').hidden = true; $('auth-view').hidden = false; $('session-message').textContent = ''; switchMode('login'); $('username').focus();}
   catch { $('session-message').textContent = 'No se pudo cerrar sesión. Intenta de nuevo.'; }
   finally {$('logout').disabled = false;}
 });

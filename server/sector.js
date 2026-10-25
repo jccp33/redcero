@@ -27,6 +27,7 @@ export function sectorRouter(db, authenticate) {
       const result=act(JSON.parse(row.state_json),req.body);
       await conn.execute('UPDATE player_sectors SET state_json=?,version=version+1,saved_at=UTC_TIMESTAMP(3) WHERE user_id=?',[JSON.stringify(result.state),req.playerId]);
       if(req.body.type!=='move') await conn.execute('INSERT INTO sector_events (user_id,action,outcome) VALUES (?,?,?)',[req.playerId,String(req.body.type||'unknown').slice(0,40),result.outcome]);
+      if(req.body.type!=='move')await conn.execute('INSERT INTO learning_evidence (user_id,level_key,mechanism_key,action,outcome,details_json) VALUES (?,?,?,?,?,?)',[req.playerId,'sector_01',String(req.body.type==='hint'?req.body.site||'unknown':req.body.type||'unknown').slice(0,24),String(req.body.type||'unknown').slice(0,32),result.outcome,JSON.stringify({schemaVersion:1,assistance:req.body.type==='hint',before:JSON.parse(row.state_json),after:result.state})]);
       await conn.commit();
       res.json({...read({...row,state_json:JSON.stringify(result.state),version:Number(row.version)+1}),message:result.message});
     } catch(error) {await conn.rollback();throw error;} finally {conn.release();}
